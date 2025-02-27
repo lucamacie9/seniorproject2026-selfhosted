@@ -7,8 +7,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 /**
  * A minimal security configuration that allows all requests without requiring authentication.
- * Keep the "spring-boot-starter-security" dependency in your pom.xml, but this config
- * overrides default security so you can test endpoints with no login.
+ * Keeping the "spring-boot-starter-security" dependency in our pom.xml, but this config
+ * overrides default security so we can test endpoints with no login.
  */
 @Configuration
 @EnableWebSecurity

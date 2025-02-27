@@ -15,7 +15,6 @@ public class CourseKu {
     @Column(name = "ku_id")
     private Integer kuId;
 
-    // No other fields, but you could add timestamps, etc.
 
     public CourseKu() {}
 
