@@ -12,6 +12,9 @@ public class Course {
     @Column(name = "course_id")
     private Integer courseId;
 
+    @Column(name = "skill_earned")
+    private String skillEarned;
+
     @Column(name = "institution_id", nullable = false)
     private Integer institutionId;
 
@@ -36,6 +39,10 @@ public class Course {
 
     public Integer getCourseId() { return courseId; }
     public void setCourseId(Integer courseId) { this.courseId = courseId; }
+
+
+    public String getSkillEarned() { return skillEarned; }
+    public void setSkillEarned(String skillEarned) { this.skillEarned = skillEarned; }
 
     public Integer getInstitutionId() { return institutionId; }
     public void setInstitutionId(Integer institutionId) { this.institutionId = institutionId; }
