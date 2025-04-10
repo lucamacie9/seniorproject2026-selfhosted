@@ -1,20 +1,17 @@
-CSIA 399 - DATABASE FILE
+CSIA 399 - DATABASE FILE-CODE
 
 -- Insert institutions
 INSERT INTO institutions (name, location) VALUES 
 ('Roosevelt University', 'Chicago, IL'),
 ('Harold Washington College', 'Chicago, IL');
-	++++
-This stays the same
-
+	
 -- Insert users (directors, students, admins)
 INSERT INTO users (name, email, password_hash, role) VALUES 
 ('Alice Johnson', 'alice.johnson@roosevelt.edu', 'hashed_password_1', 'director'),
 ('Bob Smith', 'bob.smith@hwc.edu', 'hashed_password_2', 'director'),
 ('Charlie Davis', 'charlie.davis@roosevelt.edu', 'hashed_password_3', 'student'),
 ('Diana Lee', 'diana.lee@hwc.edu', 'hashed_password_4', 'student'),
-('Eve Thompson', 'eve.thompson@admin.com', 'hashed_password_5', 'admin');
-	+++++
+('Eve Thompson', 'eve.thompson@admin.com', 'hashed_password_5', 'admin'),
 ('Sam Harper', 'sam.harper@roosevelt.edu', 'hashed_password_6', 'student'),
 ('Liam Carter', 'liam.carter@hwc.edu', 'hashed_password_7', 'student'),
 ('Elena Brooks', 'elena.brooks@roosevelt.edu', 'hashed_password_8', 'student'),
@@ -27,10 +24,9 @@ INSERT INTO users (name, email, password_hash, role) VALUES
 -- Insert directors
 INSERT INTO directors (user_id, institution_id) VALUES 
 ((SELECT user_id FROM users WHERE email = 'alice.johnson@roosevelt.edu'), (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
-((SELECT user_id FROM users WHERE email = 'bob.smith@hwc.edu'), (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'));
-	+++++
+((SELECT user_id FROM users WHERE email = 'bob.smith@hwc.edu'), (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')),
 ((SELECT user_id FROM users WHERE email = 'ethan.hayes@hwc.edu'), (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')),
-((SELECT user_id FROM users WHERE email = 'sophia.bennett@roosevelt.edu'), (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
+((SELECT user_id FROM users WHERE email = 'sophia.bennett@roosevelt.edu'), (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'));
 
 -- Insert programs
 INSERT INTO programs (institution_id, program_name) VALUES 
@@ -38,9 +34,7 @@ INSERT INTO programs (institution_id, program_name) VALUES
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 'Cybersecurity'),
 ((SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 'Information Technology'),
 ((SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 'Software Development');
-	++++
-This stays the same
-
+	
 -- Insert courses
 INSERT INTO courses (institution_id, program_id, course_name, course_code, credits) VALUES 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
@@ -81,33 +75,30 @@ INSERT INTO students (user_id, institution_id, program_id) VALUES
 
 ((SELECT user_id FROM users WHERE email = 'diana.lee@hwc.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
- (SELECT program_id FROM programs WHERE program_name = 'Software Development' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')));
+ (SELECT program_id FROM programs WHERE program_name = 'Software Development' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'))),
 
-	+++++
 
 ((SELECT user_id FROM users WHERE email = 'sam.harper@roosevelt.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
  (SELECT program_id FROM programs WHERE program_name = 'Computer Science' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'))),
 
-
 ((SELECT user_id FROM users WHERE email = 'liam.carter@hwc.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
- (SELECT program_id FROM programs WHERE program_name = 'Cybersecurity' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'))),
+ (SELECT program_id FROM programs WHERE program_name = 'Information Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'))),
 
 
 ((SELECT user_id FROM users WHERE email = 'elena.brooks@roosevelt.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
- (SELECT program_id FROM programs WHERE program_name = 'Information Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'))),
+ (SELECT program_id FROM programs WHERE program_name = 'Cybersecurity' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'))),
 
 
 ((SELECT user_id FROM users WHERE email = 'mason.reed@hwc.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
- (SELECT program_id FROM programs WHERE program_name = 'Cybersecurity' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')));
+ (SELECT program_id FROM programs WHERE program_name = 'Software Development' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')));
 
 -- Insert admin
 INSERT INTO admins (user_id) VALUES 
-((SELECT user_id FROM users WHERE email = 'eve.thompson@admin.com'));
-	+++++
+((SELECT user_id FROM users WHERE email = 'eve.thompson@admin.com')),
 ((SELECT user_id FROM users WHERE email = 'chloe.dawson@admin.com'));
 
 -- Insert course matches (example)
