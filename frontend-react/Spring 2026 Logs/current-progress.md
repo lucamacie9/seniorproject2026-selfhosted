@@ -5,7 +5,24 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
 
 ---
+## 2026-03-09
 
+### Login & Registration Pages + Validation
+**Login Page**
+- Implemented login form with email and password inputs
+- Validation to show generic error messaging ("Invalid email or password")
+
+**Registration Page** 
+- Implemented create account form with required input field
+- Password requirement messaging (minimum length)
+
+**Validation**
+- Required fields
+- Email format
+- Paswword requirements (minimum length - 6)
+- Passwords must match 
+
+  
 ## 2026-03-09
 
 ### Site skeleton
