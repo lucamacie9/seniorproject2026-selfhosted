@@ -3,7 +3,8 @@ INSERT INTO institutions (name, location) VALUES
 ('Roosevelt University', 'Chicago, IL'),
 ('National Louis University', 'Chicago, IL'),
 ('University of Chicago', 'Chicago, IL'),
-('Harold Washington College', 'Chicago, IL');
+('Harold Washington College', 'Chicago, IL'),
+('City Colleges of Chicago', 'Chicago, IL');
 	
 -- Insert users (directors, students, admins)
 INSERT INTO users (name, email, password_hash, role) VALUES 
@@ -30,7 +31,6 @@ INSERT INTO users (name, email, password_hash, role) VALUES
 ('Susan Bennett', 'susan.bennett@admin.com', 'hashed_password_22', 'admin'),
 ('Chloe Dawson', 'chloe.dawson@admin.com', 'hashed_password_12', 'admin');
 
-
 -- Insert directors
 INSERT INTO directors (user_id, institution_id) VALUES 
 ((SELECT user_id FROM users WHERE email = 'alice.johnson@roosevelt.edu'), (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
@@ -50,57 +50,27 @@ INSERT INTO programs (institution_id, program_name) VALUES
 ((SELECT institution_id FROM institutions WHERE name = 'National Louis University'), 'Computer Science'),
 ((SELECT institution_id FROM institutions WHERE name = 'University of Chicago'), 'Cloud Computing'),
 ((SELECT institution_id FROM institutions WHERE name = 'University of Chicago'), 'Information Technology'),
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 'Cyber Security and Information Assurance');
+((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 'Cyber Security and Information Assurance'),
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'), 'Cyber Security and Information Assurance'),
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'), 'Computer Systems Technology');
 	
 -- Insert courses
-INSERT INTO courses (institution_id, program_id, course_name, course_code, credits) VALUES 
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
- (SELECT program_id FROM programs WHERE program_name = 'Computer Science' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')), 
- 'Data Structures and Algorithms', 'CS101', 4),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
- (SELECT program_id FROM programs WHERE program_name = 'Cybersecurity' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')), 
- 'Network Security', 'CYB201', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
- (SELECT program_id FROM programs WHERE program_name = 'Information Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')), 
- 'IT Fundamentals', 'IT101', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
- (SELECT program_id FROM programs WHERE program_name = 'Software Development' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')), 
- 'Web Development', 'SD102', 3),
- 
+INSERT INTO courses (institution_id, program_id, course_name, course_code, credits) VALUES
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Computer Science I', 'CSIA 150', 4),
+ (SELECT program_id FROM programs WHERE program_name = 'Computer Science' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
+ 'Introduction to Programming', 'CS101', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Intro to Prob. & Stats', 'CSIA 217', 3),
+ 'Intro to Scripting', 'CSIA 150', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Python Script Programming', 'CSIA 236', 3),
+ 'Low Level Programming', 'CSIA 261', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Data Communications', 'CSIA 246', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Computer Science II', 'CSIA 250', 4),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Open Source Communities', 'CSIA 255', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Computer Organization', 'CSIA 261', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Computer Networking', 'CSIA 301', 3),
+ 'Networking', 'CSIA 301', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
@@ -108,15 +78,7 @@ INSERT INTO courses (institution_id, program_id, course_name, course_code, credi
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'UNIX and System Administration', 'CSIA 318', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Cyber Ops', 'CSIA 319', 3),
-
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Software Engineering', 'CSIA 327', 3),
+ 'System Administration', 'CSIA 318', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
@@ -124,35 +86,55 @@ INSERT INTO courses (institution_id, program_id, course_name, course_code, credi
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Ethical Hack & Countermeasures', 'CSIA 335', 3),
+ 'Cybersecurity Fundamentals', 'CSIA 359', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Practical Computing with Data in Python', 'CSIA 336', 3),
+ 'Network Security', 'CSIA 368', 3),
 
 ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
  (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Network Design', 'CSIA 352', 3),
+ 'Cybersecurity Capstone', 'CSIA 399', 3),
 
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Introduction to Programming', 'CSIA 354', 3),
+((SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'),
+ (SELECT program_id FROM programs WHERE program_name = 'Information Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')),
+ 'Intro to IT', 'IT101', 3),
 
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Applied Cryptography', 'CSIA 355', 3),
+((SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'),
+ (SELECT program_id FROM programs WHERE program_name = 'Software Development' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College')),
+ 'Database Development', 'SD102', 3),
 
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Intro to Computer Security', 'CSIA 359', 3),
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Introduction to Cybersecurity', 'CCC-CSIA-101', 3),
 
-((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Internet Security', 'CSIA 368', 3),
- 
- ((SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'),
- (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University')),
- 'Senior Project', 'CSIA 399', 3);
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Network Security Fundamentals', 'CCC-CSIA-201', 3),
+
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'System Administration', 'CCC-CSIA-202', 3),
+
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Cyber Security and Information Assurance' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Ethical Hacking Basics', 'CCC-CSIA-203', 3),
+
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Computer Systems Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Introduction to Programming', 'CCC-CST-101', 3),
+
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Computer Systems Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Computer Networking', 'CCC-CST-201', 3),
+
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Computer Systems Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Operating Systems', 'CCC-CST-202', 3),
+
+((SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago'),
+ (SELECT program_id FROM programs WHERE program_name = 'Computer Systems Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'City Colleges of Chicago')),
+ 'Database Concepts', 'CCC-CST-203', 3);
 
 -- Insert knowledge units
 INSERT INTO knowledge_units (ku_name, ku_description) VALUES 
@@ -216,8 +198,24 @@ INSERT INTO course_ku (course_id, ku_id) VALUES
 ((SELECT course_id FROM courses WHERE course_code = 'CSIA 368'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Network Security Administration')),
 ((SELECT course_id FROM courses WHERE course_code = 'CSIA 368'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Web Application Security')),
 ((SELECT course_id FROM courses WHERE course_code = 'CSIA 399'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Basic Scripting and Programming')),
-((SELECT course_id FROM courses WHERE course_code = 'CSIA 399'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Cybersecurity Ethics'));
-
+((SELECT course_id FROM courses WHERE course_code = 'CSIA 399'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Cybersecurity Ethics')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-101'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Cybersecurity Foundations')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-101'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Cybersecurity Principles')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-201'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Basic Networking')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-201'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Network Defense')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-201'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Network Security Administration')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-202'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Operating Systems Administration')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-202'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Operating Systems Concepts')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-203'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Vulnerability Analysis')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CSIA-203'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Web Application Security')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-101'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Basic Scripting and Programming')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-101'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Programming Concepts')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-201'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Basic Networking')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-201'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Network Technology and Protocols')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-202'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Operating Systems Concepts')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-202'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Operating Systems Theory')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-203'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Database Management')),
+((SELECT course_id FROM courses WHERE course_code = 'CCC-CST-203'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Database Management Systems'));
 
 -- Insert students
 INSERT INTO students (user_id, institution_id, program_id) VALUES 
@@ -229,7 +227,6 @@ INSERT INTO students (user_id, institution_id, program_id) VALUES
  (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
  (SELECT program_id FROM programs WHERE program_name = 'Software Development' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'))),
 
-
 ((SELECT user_id FROM users WHERE email = 'sam.harper@roosevelt.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
  (SELECT program_id FROM programs WHERE program_name = 'Computer Science' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'))),
@@ -238,11 +235,9 @@ INSERT INTO students (user_id, institution_id, program_id) VALUES
  (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
  (SELECT program_id FROM programs WHERE program_name = 'Information Technology' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'))),
 
-
 ((SELECT user_id FROM users WHERE email = 'elena.brooks@roosevelt.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'), 
  (SELECT program_id FROM programs WHERE program_name = 'Cybersecurity' AND institution_id = (SELECT institution_id FROM institutions WHERE name = 'Roosevelt University'))),
-
 
 ((SELECT user_id FROM users WHERE email = 'mason.reed@hwc.edu'), 
  (SELECT institution_id FROM institutions WHERE name = 'Harold Washington College'), 
