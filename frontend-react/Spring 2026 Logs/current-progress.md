@@ -5,7 +5,7 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
 
 ---
-## 2026-03-09
+## 2026-03-26
 
 ### Institutions Page Update (Contributor Note)
 - **Institutions page implementation credited to team member Yinka Yussuf.**
