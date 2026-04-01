@@ -3,6 +3,9 @@
 Log of changes and progress for teammates. Intended to be committed and pushed with the repo as development continues.
 
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
+
+---
+
 ## 2026-04-01
 
 ### Programs and Match Page Update 
@@ -37,7 +40,8 @@ Programs and Match Page implementation - Giselle Rodriguez
 - Integration behavior uses backend endpoints for institutions and programs.
 ## 2026-03-18
 
-### Login & Registration Pages Update 
+### Login & Registration Pages Update + Validation
+
 Login Page Implementation - Darius Gillard
 
 Registration Page Implementation - Giselle Rodriguez
