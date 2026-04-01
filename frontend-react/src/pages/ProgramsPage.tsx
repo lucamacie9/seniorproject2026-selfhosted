@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ProgramsPage() {
@@ -69,7 +70,9 @@ function ProgramsPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("All");
-  const [expandedProgramId, setExpandedProgramId] = useState(null);
+  const [expandedProgramId, setExpandedProgramId] = useState<number | null>(
+    null
+  );
 
   const filteredPrograms = useMemo(() => {
     return programs.filter((program) => {
@@ -84,11 +87,11 @@ function ProgramsPage() {
     });
   }, [programs, searchTerm, selectedLocation]);
 
-  const handleStartMatching = (programName) => {
+  const handleStartMatching = (programName: string) => {
     navigate("/match", { state: { selectedProgram: programName } });
   };
 
-  const toggleDetails = (programId) => {
+  const toggleDetails = (programId: number) => {
     setExpandedProgramId(expandedProgramId === programId ? null : programId);
   };
 
@@ -199,20 +202,20 @@ function ProgramsPage() {
   );
 }
 
-const pageStyle = {
+const pageStyle: CSSProperties = {
   minHeight: "100vh",
   backgroundColor: "#f4fbf6",
   paddingBottom: "50px",
 };
 
-const heroStyle = {
+const heroStyle: CSSProperties = {
   background: "linear-gradient(to bottom, #effaf1 0%, #e6f7ea 100%)",
   textAlign: "center",
   padding: "70px 20px 45px",
   borderBottom: "2px solid #24844f",
 };
 
-const heroTitleStyle = {
+const heroTitleStyle: CSSProperties = {
   margin: 0,
   fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
   fontWeight: "800",
@@ -220,7 +223,7 @@ const heroTitleStyle = {
   color: "#1f5f3f",
 };
 
-const heroSubtitleStyle = {
+const heroSubtitleStyle: CSSProperties = {
   margin: "18px auto 0",
   maxWidth: "760px",
   color: "#2e6b45",
@@ -228,18 +231,18 @@ const heroSubtitleStyle = {
   lineHeight: "1.6",
 };
 
-const topControlsWrapperStyle = {
+const topControlsWrapperStyle: CSSProperties = {
   padding: "26px 20px 10px",
 };
 
-const topButtonRowStyle = {
+const topButtonRowStyle: CSSProperties = {
   display: "flex",
   justifyContent: "center",
   gap: "14px",
   flexWrap: "wrap",
 };
 
-const primaryButtonStyle = {
+const primaryButtonStyle: CSSProperties = {
   backgroundColor: "#2f6f44",
   border: "2px solid #3f8d58",
   color: "white",
@@ -249,7 +252,7 @@ const primaryButtonStyle = {
   borderRadius: "8px",
 };
 
-const secondaryTopButtonStyle = {
+const secondaryTopButtonStyle: CSSProperties = {
   backgroundColor: "#eaf8ec",
   border: "2px solid #92b898",
   color: "#2f6f44",
@@ -259,13 +262,13 @@ const secondaryTopButtonStyle = {
   borderRadius: "8px",
 };
 
-const filterBarStyle = {
+const filterBarStyle: CSSProperties = {
   maxWidth: "1200px",
   margin: "0 auto",
   padding: "26px 20px 10px",
 };
 
-const searchRowStyle = {
+const searchRowStyle: CSSProperties = {
   display: "flex",
   gap: "14px",
   flexWrap: "wrap",
@@ -273,7 +276,7 @@ const searchRowStyle = {
   marginBottom: "24px",
 };
 
-const searchInputStyle = {
+const searchInputStyle: CSSProperties = {
   minWidth: "300px",
   maxWidth: "500px",
   width: "100%",
@@ -285,7 +288,7 @@ const searchInputStyle = {
   outline: "none",
 };
 
-const selectStyle = {
+const selectStyle: CSSProperties = {
   minWidth: "220px",
   padding: "14px 16px",
   borderRadius: "8px",
@@ -295,7 +298,7 @@ const selectStyle = {
   outline: "none",
 };
 
-const locationRowStyle = {
+const locationRowStyle: CSSProperties = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -305,12 +308,12 @@ const locationRowStyle = {
   marginBottom: "30px",
 };
 
-const locationLabelStyle = {
+const locationLabelStyle: CSSProperties = {
   fontWeight: "700",
   marginRight: "6px",
 };
 
-const locationButtonStyle = {
+const locationButtonStyle: CSSProperties = {
   background: "transparent",
   border: "1px solid transparent",
   color: "#2f6f44",
@@ -320,12 +323,12 @@ const locationButtonStyle = {
   fontSize: "0.85rem",
 };
 
-const activeLocationButtonStyle = {
+const activeLocationButtonStyle: CSSProperties = {
   color: "#2f6f44",
   borderBottom: "2px solid #2f6f44",
 };
 
-const gridStyle = {
+const gridStyle: CSSProperties = {
   maxWidth: "1400px",
   margin: "0 auto",
   padding: "0 20px",
@@ -334,7 +337,7 @@ const gridStyle = {
   gap: "18px",
 };
 
-const cardStyle = {
+const cardStyle: CSSProperties = {
   backgroundColor: "white",
   border: "1px solid #d5ead8",
   borderRadius: "14px",
@@ -345,33 +348,33 @@ const cardStyle = {
   boxShadow: "0 4px 12px rgba(46, 139, 87, 0.08)",
 };
 
-const cardTitleStyle = {
+const cardTitleStyle: CSSProperties = {
   fontSize: "1.6rem",
   margin: "0 0 10px 0",
   color: "#1f4d2e",
 };
 
-const cardLocationStyle = {
+const cardLocationStyle: CSSProperties = {
   color: "#4f7a57",
   fontSize: "0.95rem",
   fontWeight: "600",
   marginBottom: "14px",
 };
 
-const cardDescriptionStyle = {
+const cardDescriptionStyle: CSSProperties = {
   color: "#355e3b",
   lineHeight: "1.6",
   fontSize: "0.97rem",
   margin: 0,
 };
 
-const buttonGroupStyle = {
+const buttonGroupStyle: CSSProperties = {
   display: "flex",
   gap: "10px",
   flexWrap: "wrap",
 };
 
-const detailsButtonStyle = {
+const detailsButtonStyle: CSSProperties = {
   backgroundColor: "#edf8f0",
   color: "#2e6b3a",
   border: "1px solid #7bc47f",
@@ -381,7 +384,7 @@ const detailsButtonStyle = {
   cursor: "pointer",
 };
 
-const matchButtonStyle = {
+const matchButtonStyle: CSSProperties = {
   backgroundColor: "#2e8b57",
   color: "white",
   border: "none",
@@ -391,7 +394,7 @@ const matchButtonStyle = {
   cursor: "pointer",
 };
 
-const detailsBoxStyle = {
+const detailsBoxStyle: CSSProperties = {
   marginTop: "4px",
   padding: "16px",
   borderRadius: "10px",
@@ -399,19 +402,19 @@ const detailsBoxStyle = {
   border: "1px solid #cfe7d4",
 };
 
-const detailsHeadingStyle = {
+const detailsHeadingStyle: CSSProperties = {
   margin: "0 0 8px 0",
   color: "#1f4d2e",
   fontSize: "1rem",
 };
 
-const detailsTextStyle = {
+const detailsTextStyle: CSSProperties = {
   margin: 0,
   color: "#355e3b",
   lineHeight: "1.6",
 };
 
-const emptyStateStyle = {
+const emptyStateStyle: CSSProperties = {
   gridColumn: "1 / -1",
   textAlign: "center",
   padding: "40px 20px",
