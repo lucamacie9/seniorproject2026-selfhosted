@@ -3,6 +3,26 @@
 Log of changes and progress for teammates. Intended to be committed and pushed with the repo as development continues.
 
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
+## 2026-04-01
+
+### Programs and Match Page Update 
+Programs and Match Page implementation - Giselle Rodriguez 
+
+**Programs page**
+- Redesigned the `/programs` page with updated layout and structure
+- Placeholder Roosevelt program cards (Program 1, Program 2, Program 3) for demo and layout purposes
+- Search functionality for filtering visible programs
+- Location filter options (All, Chicago, Schaumburg, Online)
+- Expandable **View Course Details** behavior for each program card to display placeholder course descriptions
+-  **Start Matching** button on each card to route users to the `/match` page
+
+### Match Page Update
+- Updated the `/match` page layout to match Programs page styling 
+- Search and dropdown selection for both **From Course** and **To Course** fields
+- Placeholder course options (Course 1-6) for demo/testing purposes
+- Mock matching behavior to display **Full Match**, **Partial Match**, or **No Match** results
+- **Save Transfer Plan** functionality
+- **Saved Transfer Plans** section so users can view saved selections after saving
 
 ---
 ## 2026-03-26
@@ -15,8 +35,13 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
   - Target program filtering based on selected target institution
   - Confirm action and summary display
 - Integration behavior uses backend endpoints for institutions and programs.
+## 2026-03-18
 
-### Login & Registration Pages + Validation
+### Login & Registration Pages Update 
+Login Page Implementation - Darius Gillard
+
+Registration Page Implementation - Giselle Rodriguez
+
 **Login Page**
 - Implemented login form with email and password inputs
 - Validation to show generic error messaging ("Invalid email or password")

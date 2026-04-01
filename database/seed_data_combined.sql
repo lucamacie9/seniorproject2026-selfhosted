@@ -168,7 +168,6 @@ INSERT INTO knowledge_units (ku_name, ku_description) VALUES
 -- Associate courses with knowledge units
 INSERT INTO course_ku (course_id, ku_id) VALUES 
 ((SELECT course_id FROM courses WHERE course_code = 'CS101'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Programming Concepts')),
-((SELECT course_id FROM courses WHERE course_code = 'CYB201'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Cybersecurity Basics')),
 ((SELECT course_id FROM courses WHERE course_code = 'IT101'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Networking Fundamentals')),
 ((SELECT course_id FROM courses WHERE course_code = 'SD102'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Database Management')),
 ((SELECT course_id FROM courses WHERE course_code = 'CSIA 150'), (SELECT ku_id FROM knowledge_units WHERE ku_name = 'Basic Scripting and Programming')),

@@ -1,12 +1,20 @@
 function LandingPage() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* Hero / header area similar to index.html */}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+        fontFamily: '"Times New Roman", Times, serif', 
+      }}
+    >
+      
+      {/* HERO SECTION */}
       <section
         style={{
           padding: '3rem 2rem',
-          background: '#e9f5ff',
-          borderRadius: '8px',
+          background: '#edf8f0',
+          borderRadius: '12px',
         }}
       >
         <div
@@ -16,80 +24,134 @@ function LandingPage() {
             textAlign: 'center',
           }}
         >
-          <div
+          <img
+            src="/ru-banner.jpg"
+            alt="Roosevelt University Banner"
             style={{
-              height: 160,
-              border: '2px dashed #99b',
-              borderRadius: '8px',
+              width: '100%',
+              height: 170,
+              objectFit: 'contain',
+              borderRadius: '10px',
               marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#556',
-              fontSize: '0.95rem',
             }}
-          >
-            Hero image / header banner
-          </div>
-          <h1 style={{ marginBottom: '0.5rem' }}>Transfer Credit Match</h1>
-          <p style={{ margin: 0, color: '#555' }}>
-            Short tagline describing what this page is about.
+          />
+
+          <h1 style={{ marginBottom: '0.5rem', color: '#1f4d2e' }}>
+            Transfer to Roosevelt University
+          </h1>
+
+          <p style={{ margin: 0, color: '#355e3b' }}>
+            Explore how your completed coursework transfers into Roosevelt University programs.
           </p>
         </div>
       </section>
 
-      {/* Cards grid similar to legacy home college cards */}
-      <section style={{ maxWidth: 1024, margin: '0 auto' }}>
-        <h2 style={{ marginBottom: '1rem' }}>Featured institutions section</h2>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '1rem',
-          }}
-        >
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              style={{
-                border: '1px dashed #ccc',
-                borderRadius: '8px',
-                padding: '1.5rem',
-                minHeight: 160,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem',
-              }}
-            >
-              <div
-                style={{
-                  height: 80,
-                  background: '#f7f7f7',
-                  borderRadius: '4px',
-                }}
-              />
-              <div
-                style={{
-                  height: 14,
-                  background: '#eee',
-                  borderRadius: '4px',
-                  width: '60%',
-                }}
-              />
-              <div
-                style={{
-                  height: 12,
-                  background: '#f0f0f0',
-                  borderRadius: '4px',
-                  width: '40%',
-                }}
-              />
-            </div>
-          ))}
+      {/* FEATURE SECTIONS */}
+      <section
+        style={{
+          maxWidth: 1100,
+          margin: '0 auto',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '1.5rem',
+        }}
+      >
+
+        {/* Learn */}
+        <div style={cardStyle}>
+          <img src="/learn.jpg" alt="Learn about Roosevelt" style={imageStyle} />
+
+          <h3 style={cardTitleStyle}>Learn About Roosevelt</h3>
+
+          <p style={cardDescriptionStyle}>
+            Discover how transfer credits work and understand how Roosevelt evaluates your completed coursework.
+          </p>
+
+          <a href="/about" style={cardButtonStyle}>
+            Learn More
+          </a>
         </div>
+
+        {/* Match */}
+        <div style={cardStyle}>
+          <img src="/match.jpg" alt="Transfer credit matching" style={imageStyle} />
+
+          <h3 style={cardTitleStyle}>Search Transfer Credits</h3>
+
+          <p style={cardDescriptionStyle}>
+            Enter your courses and see how they match Roosevelt University requirements.
+          </p>
+
+          <a href="/match" style={cardButtonStyle}>
+            Start Matching
+          </a>
+        </div>
+
+        {/* Programs */}
+        <div style={cardStyle}>
+          <img src="/programs.jpg" alt="Browse programs" style={imageStyle} />
+
+          <h3 style={cardTitleStyle}>Browse Programs</h3>
+
+          <p style={cardDescriptionStyle}>
+            Explore Roosevelt University degree programs and academic pathways.
+          </p>
+
+          <a href="/programs" style={cardButtonStyle}>
+            View Programs
+          </a>
+        </div>
+
       </section>
     </div>
   )
+}
+
+
+const cardStyle = {
+  border: '1px solid #d5ead8',
+  borderRadius: '14px',
+  padding: '1.2rem',
+  background: '#ffffff',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+  boxShadow: '0 4px 12px rgba(46, 139, 87, 0.08)',
+}
+
+const imageStyle = {
+  width: '100%',
+  height: 150,
+  objectFit: 'cover',
+  borderRadius: '10px',
+}
+
+const cardTitleStyle = {
+  fontSize: '1.2rem',
+  color: '#1f4d2e',
+  margin: '0.2rem 0',
+}
+
+const cardDescriptionStyle = {
+  color: '#355e3b',
+  fontSize: '0.95rem',
+  lineHeight: '1.5',
+  margin: 0,
+}
+
+
+const cardButtonStyle = {
+  marginTop: 'auto',
+  backgroundColor: "#edf8f0",
+  color: "#2e6b3a",
+  border: "1px solid #7bc47f",
+  padding: "10px 14px",
+  borderRadius: "8px",
+  fontWeight: "700",
+  cursor: "pointer",
+  textDecoration: "none",
+  display: "inline-block",
+  textAlign: "center",
 }
 
 export default LandingPage
