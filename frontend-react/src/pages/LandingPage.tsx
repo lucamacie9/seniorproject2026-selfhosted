@@ -28,7 +28,7 @@ function LandingPage() {
 />
           <h1 style={{ marginBottom: '0.5rem' }}>Transfer Credit Match</h1>
           <p style={{ margin: 0, color: '#555' }}>
-            Short tagline describing what this page is about.
+            Discover how your courses and credits transfer to Roosevelt University
           </p>
         </div>
       </section>
