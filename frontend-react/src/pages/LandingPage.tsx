@@ -1,13 +1,20 @@
 function LandingPage() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem',
+        fontFamily: '"Times New Roman", Times, serif', 
+      }}
+    >
       
       {/* HERO SECTION */}
       <section
         style={{
           padding: '3rem 2rem',
-          background: '#e8f5e9',
-          borderRadius: '8px',
+          background: '#edf8f0',
+          borderRadius: '12px',
         }}
       >
         <div
@@ -22,18 +29,18 @@ function LandingPage() {
             alt="Roosevelt University Banner"
             style={{
               width: '100%',
-              height: 160,
-              objectFit: 'cover',
-              borderRadius: '8px',
+              height: 170,
+              objectFit: 'contain',
+              borderRadius: '10px',
               marginBottom: '1.5rem',
             }}
           />
 
-          <h1 style={{ marginBottom: '0.5rem' }}>
+          <h1 style={{ marginBottom: '0.5rem', color: '#1f4d2e' }}>
             Transfer to Roosevelt University
           </h1>
 
-          <p style={{ margin: 0, color: '#555' }}>
+          <p style={{ margin: 0, color: '#355e3b' }}>
             Explore how your completed coursework transfers into Roosevelt University programs.
           </p>
         </div>
@@ -52,14 +59,11 @@ function LandingPage() {
 
         {/* Learn */}
         <div style={cardStyle}>
-          <img
-            src="/learn.jpg"
-            alt="Learn about Roosevelt"
-            style={imageStyle}
-          />
+          <img src="/learn.jpg" alt="Learn about Roosevelt" style={imageStyle} />
 
-          <h3>Learn About RU</h3>
-          <p style={{ color: '#666', fontSize: '0.9rem' }}>
+          <h3 style={cardTitleStyle}>Learn About Roosevelt</h3>
+
+          <p style={cardDescriptionStyle}>
             Discover how transfer credits work and understand how Roosevelt evaluates your completed coursework.
           </p>
 
@@ -70,14 +74,11 @@ function LandingPage() {
 
         {/* Match */}
         <div style={cardStyle}>
-          <img
-            src="/transfer.jpg"
-            alt="Transfer credit matching"
-            style={imageStyle}
-          />
+          <img src="/match.jpg" alt="Transfer credit matching" style={imageStyle} />
 
-          <h3>Search Transfer Credits</h3>
-          <p style={{ color: '#666', fontSize: '0.9rem' }}>
+          <h3 style={cardTitleStyle}>Search Transfer Credits</h3>
+
+          <p style={cardDescriptionStyle}>
             Enter your courses and see how they match Roosevelt University requirements.
           </p>
 
@@ -88,14 +89,11 @@ function LandingPage() {
 
         {/* Programs */}
         <div style={cardStyle}>
-          <img
-            src="/programs.jpg"
-            alt="Browse programs"
-            style={imageStyle}
-          />
+          <img src="/programs.jpg" alt="Browse programs" style={imageStyle} />
 
-          <h3>Browse Programs</h3>
-          <p style={{ color: '#666', fontSize: '0.9rem' }}>
+          <h3 style={cardTitleStyle}>Browse Programs</h3>
+
+          <p style={cardDescriptionStyle}>
             Explore Roosevelt University degree programs and academic pathways.
           </p>
 
@@ -109,33 +107,51 @@ function LandingPage() {
   )
 }
 
-export default LandingPage
 
-// Styles
 const cardStyle = {
-  border: '1px solid #ddd',
-  borderRadius: '8px',
-  padding: '1rem',
-  background: '#fff',
+  border: '1px solid #d5ead8',
+  borderRadius: '14px',
+  padding: '1.2rem',
+  background: '#ffffff',
   display: 'flex',
   flexDirection: 'column',
   gap: '0.75rem',
+  boxShadow: '0 4px 12px rgba(46, 139, 87, 0.08)',
 }
 
 const imageStyle = {
   width: '100%',
-  height: 140,
+  height: 150,
   objectFit: 'cover',
-  borderRadius: '6px',
+  borderRadius: '10px',
 }
+
+const cardTitleStyle = {
+  fontSize: '1.2rem',
+  color: '#1f4d2e',
+  margin: '0.2rem 0',
+}
+
+const cardDescriptionStyle = {
+  color: '#355e3b',
+  fontSize: '0.95rem',
+  lineHeight: '1.5',
+  margin: 0,
+}
+
 
 const cardButtonStyle = {
   marginTop: 'auto',
-  padding: '0.5rem 1rem',
-  background: '#178581',
-  color: '#fff',
-  borderRadius: '6px',
-  textDecoration: 'none',
-  display: 'inline-block',
-  textAlign: 'center',
+  backgroundColor: "#edf8f0",
+  color: "#2e6b3a",
+  border: "1px solid #7bc47f",
+  padding: "10px 14px",
+  borderRadius: "8px",
+  fontWeight: "700",
+  cursor: "pointer",
+  textDecoration: "none",
+  display: "inline-block",
+  textAlign: "center",
 }
+
+export default LandingPage
