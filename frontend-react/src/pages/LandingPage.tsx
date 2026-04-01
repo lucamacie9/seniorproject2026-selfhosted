@@ -1,106 +1,95 @@
-import React from "react";
-
-export default function LandingPage() {
-  const sections = ["Institutions", "Programs", "Courses", "Knowledge Units"];
-
+function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-
-      {/* HERO */}
-      <div className="text-center px-6 py-20 bg-white border-b">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          Transfer Credit Match
-        </h1>
-
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-          Explore how institutions, programs, courses, and knowledge units connect
-          to support transfer credit mapping — all in one place.
-        </p>
-
-        <div className="mt-8 flex justify-center gap-4">
-          <button className="px-8 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-            Get Started
-          </button>
-
-          <button className="px-8 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
-            Learn More
-          </button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+      {/* Hero / header area similar to index.html */}
+      <section
+        style={{
+          padding: '3rem 2rem',
+          background: '#e9f5ff',
+          borderRadius: '8px',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 800,
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              height: 160,
+              border: '2px dashed #99b',
+              borderRadius: '8px',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#556',
+              fontSize: '0.95rem',
+            }}
+          >
+            Hero image / header banner
+          </div>
+          <h1 style={{ marginBottom: '0.5rem' }}>Transfer Credit Match</h1>
+          <p style={{ margin: 0, color: '#555' }}>
+            Short tagline describing what this page is about.
+          </p>
         </div>
-      </div>
+      </section>
 
-      {/* FEATURE SECTIONS */}
-      <div className="px-6 py-16">
-        <h2 className="text-2xl font-semibold text-center text-gray-700 mb-12">
-          Core Components
-        </h2>
-
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          {sections.map((section) => (
+      {/* Cards grid similar to legacy home college cards */}
+      <section style={{ maxWidth: 1024, margin: '0 auto' }}>
+        <h2 style={{ marginBottom: '1rem' }}>Featured institutions section</h2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '1rem',
+          }}
+        >
+          {[1, 2, 3].map((i) => (
             <div
-              key={section}
-              className="bg-white border rounded-xl shadow-sm p-6 flex flex-col gap-4"
+              key={i}
+              style={{
+                border: '1px dashed #ccc',
+                borderRadius: '8px',
+                padding: '1.5rem',
+                minHeight: 160,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
             >
-              <h3 className="text-xl font-semibold text-gray-800">
-                {section}
-              </h3>
-
-              <p className="text-sm text-gray-500">
-                Manage and organize {section.toLowerCase()} within the transfer credit system.
-              </p>
-
-              {/* Preview box */}
-              <div className="border border-dashed border-gray-200 rounded-lg p-4 bg-gray-50 text-sm text-gray-500">
-                {section === "Institutions" && "Example: Roosevelt University"}
-                {section === "Programs" && "Example: Cybersecurity"}
-                {section === "Courses" && "Example: CST 261 - Assembly Programming"}
-                {section === "Knowledge Units" && "Example: Binary Calculations"}
-              </div>
-
-              <button className="mt-auto self-start px-4 py-2 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-800">
-                View {section}
-              </button>
+              <div
+                style={{
+                  height: 80,
+                  background: '#f7f7f7',
+                  borderRadius: '4px',
+                }}
+              />
+              <div
+                style={{
+                  height: 14,
+                  background: '#eee',
+                  borderRadius: '4px',
+                  width: '60%',
+                }}
+              />
+              <div
+                style={{
+                  height: 12,
+                  background: '#f0f0f0',
+                  borderRadius: '4px',
+                  width: '40%',
+                }}
+              />
             </div>
           ))}
         </div>
-      </div>
-
-      {/* FEATURE HIGHLIGHTS */}
-      <div className="bg-white border-t px-6 py-16">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-10">
-            Why Use This System?
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-6 text-left">
-            <div className="p-5 border rounded-lg">
-              <h4 className="font-semibold mb-2">Structured Data</h4>
-              <p className="text-sm text-gray-600">
-                Organize institutions, programs, courses, and knowledge units in a clear hierarchy.
-              </p>
-            </div>
-
-            <div className="p-5 border rounded-lg">
-              <h4 className="font-semibold mb-2">Transfer Mapping</h4>
-              <p className="text-sm text-gray-600">
-                Understand how academic credits relate across different institutions.
-              </p>
-            </div>
-
-            <div className="p-5 border rounded-lg">
-              <h4 className="font-semibold mb-2">Simple Interface</h4>
-              <p className="text-sm text-gray-600">
-                Clean and easy-to-use layout designed for clarity and usability.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* FOOTER */}
-      <div className="text-center py-6 text-sm text-gray-500 border-t">
-        © 2026 Transfer Credit Match
-      </div>
+      </section>
     </div>
-  );
+  )
 }
 
+export default LandingPage
