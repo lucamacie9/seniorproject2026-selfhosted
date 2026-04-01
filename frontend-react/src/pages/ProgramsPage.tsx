@@ -1,343 +1,424 @@
-import { useMemo, useState } from "react";
-
-type Program = {
-  id: number;
-  name: string;
-  institution: string;
-  degreeType: string;
-  credits: number;
-  description: string;
-};
-
-const mockPrograms: Program[] = [
-  {
-    id: 1,
-    name: "Program 1",
-    institution: "University 1",
-    degreeType: "BS",
-    credits: 120,
-    description:
-      "description for program ",
-  },
-  {
-    id: 2,
-    name: "Program 2",
-    institution: "University 1",
-    degreeType: "BS",
-    credits: 120,
-    description:
-      "description for program",
-  },
-  {
-    id: 3,
-    name: "Program 3",
-    institution: "University 2",
-    degreeType: "AA",
-    credits: 60,
-    description:
-      "description for program ",
-  },
-  {
-    id: 4,
-    name: "Program 4",
-    institution: "University 1",
-    degreeType: "BA",
-    credits: 120,
-    description:
-      "description for program ",
-  },
-  {
-    id: 5,
-    name: "Program 5",
-    institution: "University 3",
-    degreeType: "AS",
-    credits: 60,
-    description:
-      "description for program ",
-  },
-];
+import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function ProgramsPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [institutionFilter, setInstitutionFilter] = useState("");
-  const [degreeFilter, setDegreeFilter] = useState("");
+  const navigate = useNavigate();
 
-  const institutions = [...new Set(mockPrograms.map((program) => program.institution))];
-  const degreeTypes = [...new Set(mockPrograms.map((program) => program.degreeType))];
+  const programs = [
+    {
+      id: 1,
+      name: "Program 1",
+      type: "",
+      location: "Chicago",
+      description:
+        "Program description for Program 1.",
+      programDetails:
+        "Program details and sample courses for Program 1",
+    },
+    {
+      id: 2,
+      name: "Program 2",
+      type: "",
+      location: "Schaumburg",
+      description:
+        " Program description for Program 2",
+      programDetails:
+        "Program details and sample courses for Program 2 ",
+    },
+    {
+      id: 3,
+      name: "Program 3",
+      type: "",
+      location: "Online",
+      description:
+        "Program description for Program 3",
+      programDetails:
+        "Program details and sample courses for program 3",
+    },
+    {
+      id: 4,
+      name: "Program 4",
+      type: "",
+      location: "Chicago",
+      description:
+        "Program description for Program 4 ",
+      programDetails:
+        "Program details and sample courses for Program 4",
+    },
+    {
+      id: 5,
+      name: "Program 5",
+      type: "",
+      location: "Online",
+      description:
+        "Program description for Program 5",
+      programDetails:
+        "Program details and sample courses for Program 5",
+    },
+    {
+      id: 6,
+      name: "Program 6",
+      type: "",
+      location: "Schaumburg",
+      description:
+        "Program description for Program 6",
+      programDetails:
+        "Program details and sample courses for Program 6",
+    },
+  ];
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [expandedProgramId, setExpandedProgramId] = useState(null);
 
   const filteredPrograms = useMemo(() => {
-    return mockPrograms.filter((program) => {
+    return programs.filter((program) => {
       const matchesSearch =
         program.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         program.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesInstitution =
-        institutionFilter === "" || program.institution === institutionFilter;
+      const matchesLocation =
+        selectedLocation === "All" || program.location === selectedLocation;
 
-      const matchesDegree =
-        degreeFilter === "" || program.degreeType === degreeFilter;
-
-      return matchesSearch && matchesInstitution && matchesDegree;
+      return matchesSearch && matchesLocation;
     });
-  }, [searchTerm, institutionFilter, degreeFilter]);
+  }, [programs, searchTerm, selectedLocation]);
 
-  const handleClearFilters = () => {
-    setSearchTerm("");
-    setInstitutionFilter("");
-    setDegreeFilter("");
+  const handleStartMatching = (programName) => {
+    navigate("/match", { state: { selectedProgram: programName } });
+  };
+
+  const toggleDetails = (programId) => {
+    setExpandedProgramId(expandedProgramId === programId ? null : programId);
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.headerSection}>
-        <h1 style={styles.title}>Programs</h1>
-        <p style={styles.subtitle}>
-          Browse and manage academic programs. This page currently uses placeholder
-          data and can later be connected to backend program information.
+    <div style={pageStyle}>
+      <section style={heroStyle}>
+        <h1 style={heroTitleStyle}>ROOSEVELT UNIVERSITY PROGRAMS</h1>
+        <p style={heroSubtitleStyle}>
+          Browse Roosevelt programs and explore course information
+          before moving into the transfer matching process.
         </p>
-      </div>
+      </section>
 
-      <div style={styles.filterContainer}>
-        <input
-          type="text"
-          placeholder="Search by program name or keyword"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={styles.input}
-        />
+      <section style={topControlsWrapperStyle}>
+        <div style={topButtonRowStyle}>
+          <button
+            style={primaryButtonStyle}
+            onClick={() => {
+              setSearchTerm("");
+              setSelectedLocation("All");
+            }}
+          >
+            SHOW ALL PROGRAMS
+          </button>
 
-        <select
-          value={institutionFilter}
-          onChange={(e) => setInstitutionFilter(e.target.value)}
-          style={styles.select}
-        >
-          <option value="">All Institutions</option>
-          {institutions.map((institution) => (
-            <option key={institution} value={institution}>
-              {institution}
-            </option>
+          <button style={secondaryTopButtonStyle}>PROGRAMS BY TYPE</button>
+        </div>
+      </section>
+
+      <section style={filterBarStyle}>
+        <div style={searchRowStyle}>
+          <input
+            type="text"
+            placeholder="Search Roosevelt programs..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={searchInputStyle}
+          />
+
+          <select style={selectStyle} defaultValue="">
+            <option value="">Programs by Type</option>
+          </select>
+        </div>
+
+        <div style={locationRowStyle}>
+          <span style={locationLabelStyle}>Filter by location:</span>
+
+          {["All", "Chicago", "Schaumburg", "Online"].map((location) => (
+            <button
+              key={location}
+              onClick={() => setSelectedLocation(location)}
+              style={{
+                ...locationButtonStyle,
+                ...(selectedLocation === location
+                  ? activeLocationButtonStyle
+                  : {}),
+              }}
+            >
+              {location.toUpperCase()}
+            </button>
           ))}
-        </select>
+        </div>
+      </section>
 
-        <select
-          value={degreeFilter}
-          onChange={(e) => setDegreeFilter(e.target.value)}
-          style={styles.select}
-        >
-          <option value="">All Degree Types</option>
-          {degreeTypes.map((degree) => (
-            <option key={degree} value={degree}>
-              {degree}
-            </option>
-          ))}
-        </select>
-
-        <button onClick={handleClearFilters} style={styles.clearButton}>
-          Clear
-        </button>
-      </div>
-
-      <div style={styles.resultsHeader}>
-        <p style={styles.resultsText}>
-          Showing {filteredPrograms.length} program
-          {filteredPrograms.length !== 1 ? "s" : ""}
-        </p>
-      </div>
-
-      <div style={styles.cardsContainer}>
+      <section style={gridStyle}>
         {filteredPrograms.length > 0 ? (
           filteredPrograms.map((program) => (
-            <div key={program.id} style={styles.card}>
-              <div style={styles.cardTop}>
-                <div>
-                  <h2 style={styles.cardTitle}>{program.name}</h2>
-                  <p style={styles.cardInstitution}>{program.institution}</p>
+            <div key={program.id} style={cardStyle}>
+              <div>
+                <h3 style={cardTitleStyle}>{program.name}</h3>
+                <p style={cardLocationStyle}>{program.location}</p>
+                <p style={cardDescriptionStyle}>{program.description}</p>
+              </div>
+
+              <div style={buttonGroupStyle}>
+                <button
+                  style={detailsButtonStyle}
+                  onClick={() => toggleDetails(program.id)}
+                >
+                  {expandedProgramId === program.id
+                    ? "HIDE COURSE DETAILS"
+                    : "VIEW COURSE DETAILS"}
+                </button>
+
+                <button
+                  style={matchButtonStyle}
+                  onClick={() => handleStartMatching(program.name)}
+                >
+                  START MATCHING
+                </button>
+              </div>
+
+              {expandedProgramId === program.id && (
+                <div style={detailsBoxStyle}>
+                  <h4 style={detailsHeadingStyle}>Course Description</h4>
+                  <p style={detailsTextStyle}>{program.programDetails}</p>
                 </div>
-                <span style={styles.badge}>{program.degreeType}</span>
-              </div>
-
-              <p style={styles.description}>{program.description}</p>
-
-              <div style={styles.metaRow}>
-                <span style={styles.metaItem}>
-                  <strong>Credits:</strong> {program.credits}
-                </span>
-              </div>
-
-              <div style={styles.buttonRow}>
-                <button style={styles.primaryButton}>View Details</button>
-                <button style={styles.secondaryButton}>Edit</button>
-              </div>
+              )}
             </div>
           ))
         ) : (
-          <div style={styles.emptyState}>
-            <h3 style={styles.emptyTitle}>No programs found</h3>
-            <p style={styles.emptyText}>
-              Try changing your search term or filters.
-            </p>
+          <div style={emptyStateStyle}>
+            No programs match your current search or filters.
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    maxWidth: "1100px",
-    margin: "0 auto",
-    padding: "32px 24px 48px",
-    fontFamily: "Arial, sans-serif",
-    color: "#1f2937",
-    backgroundColor: "#f9fafb",
-    minHeight: "100vh",
-  },
-  headerSection: {
-    marginBottom: "24px",
-  },
-  title: {
-    fontSize: "36px",
-    fontWeight: 700,
-    marginBottom: "8px",
-  },
-  subtitle: {
-    fontSize: "16px",
-    color: "#4b5563",
-    margin: 0,
-    lineHeight: 1.5,
-  },
-  filterContainer: {
-    display: "grid",
-    gridTemplateColumns: "2fr 1fr 1fr auto",
-    gap: "12px",
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
-    borderRadius: "16px",
-    padding: "16px",
-    marginBottom: "20px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-  },
-  input: {
-    padding: "12px 14px",
-    borderRadius: "10px",
-    border: "1px solid #d1d5db",
-    fontSize: "14px",
-    outline: "none",
-  },
-  select: {
-    padding: "12px 14px",
-    borderRadius: "10px",
-    border: "1px solid #d1d5db",
-    fontSize: "14px",
-    backgroundColor: "#fff",
-    outline: "none",
-  },
-  clearButton: {
-    padding: "12px 18px",
-    borderRadius: "999px",
-    border: "none",
-    backgroundColor: "#111827",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  resultsHeader: {
-    marginBottom: "16px",
-  },
-  resultsText: {
-    fontSize: "14px",
-    color: "#6b7280",
-    margin: 0,
-  },
-  cardsContainer: {
-    display: "grid",
-    gap: "16px",
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e5e7eb",
-    borderRadius: "18px",
-    padding: "20px",
-    boxShadow: "0 3px 10px rgba(0,0,0,0.05)",
-  },
-  cardTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: "12px",
-    marginBottom: "12px",
-  },
-  cardTitle: {
-    fontSize: "22px",
-    margin: 0,
-    fontWeight: 700,
-  },
-  cardInstitution: {
-    margin: "6px 0 0",
-    color: "#6b7280",
-    fontSize: "14px",
-  },
-  badge: {
-    backgroundColor: "#e5e7eb",
-    color: "#111827",
-    padding: "6px 12px",
-    borderRadius: "999px",
-    fontSize: "13px",
-    fontWeight: 600,
-    whiteSpace: "nowrap",
-  },
-  description: {
-    margin: "0 0 12px",
-    fontSize: "15px",
-    color: "#374151",
-    lineHeight: 1.5,
-  },
-  metaRow: {
-    marginBottom: "16px",
-  },
-  metaItem: {
-    fontSize: "14px",
-    color: "#374151",
-  },
-  buttonRow: {
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-  },
-  primaryButton: {
-    padding: "10px 16px",
-    borderRadius: "10px",
-    border: "none",
-    backgroundColor: "#2563eb",
-    color: "#ffffff",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  secondaryButton: {
-    padding: "10px 16px",
-    borderRadius: "10px",
-    border: "1px solid #d1d5db",
-    backgroundColor: "#ffffff",
-    color: "#111827",
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  emptyState: {
-    backgroundColor: "#ffffff",
-    border: "1px dashed #d1d5db",
-    borderRadius: "16px",
-    padding: "32px",
-    textAlign: "center",
-  },
-  emptyTitle: {
-    margin: "0 0 8px",
-    fontSize: "20px",
-  },
-  emptyText: {
-    margin: 0,
-    color: "#6b7280",
-  },
+const pageStyle = {
+  minHeight: "100vh",
+  backgroundColor: "#f4fbf6",
+  paddingBottom: "50px",
+};
+
+const heroStyle = {
+  background: "linear-gradient(to bottom, #effaf1 0%, #e6f7ea 100%)",
+  textAlign: "center",
+  padding: "70px 20px 45px",
+  borderBottom: "2px solid #24844f",
+};
+
+const heroTitleStyle = {
+  margin: 0,
+  fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
+  fontWeight: "800",
+  letterSpacing: "1px",
+  color: "#1f5f3f",
+};
+
+const heroSubtitleStyle = {
+  margin: "18px auto 0",
+  maxWidth: "760px",
+  color: "#2e6b45",
+  fontSize: "1.05rem",
+  lineHeight: "1.6",
+};
+
+const topControlsWrapperStyle = {
+  padding: "26px 20px 10px",
+};
+
+const topButtonRowStyle = {
+  display: "flex",
+  justifyContent: "center",
+  gap: "14px",
+  flexWrap: "wrap",
+};
+
+const primaryButtonStyle = {
+  backgroundColor: "#2f6f44",
+  border: "2px solid #3f8d58",
+  color: "white",
+  fontWeight: "700",
+  padding: "14px 24px",
+  cursor: "pointer",
+  borderRadius: "8px",
+};
+
+const secondaryTopButtonStyle = {
+  backgroundColor: "#eaf8ec",
+  border: "2px solid #92b898",
+  color: "#2f6f44",
+  fontWeight: "700",
+  padding: "14px 24px",
+  cursor: "pointer",
+  borderRadius: "8px",
+};
+
+const filterBarStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto",
+  padding: "26px 20px 10px",
+};
+
+const searchRowStyle = {
+  display: "flex",
+  gap: "14px",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  marginBottom: "24px",
+};
+
+const searchInputStyle = {
+  minWidth: "300px",
+  maxWidth: "500px",
+  width: "100%",
+  padding: "14px 16px",
+  borderRadius: "8px",
+  border: "1px solid #b8d8bf",
+  backgroundColor: "white",
+  color: "#1f1f1f",
+  outline: "none",
+};
+
+const selectStyle = {
+  minWidth: "220px",
+  padding: "14px 16px",
+  borderRadius: "8px",
+  border: "1px solid #b8d8bf",
+  backgroundColor: "white",
+  color: "#1f1f1f",
+  outline: "none",
+};
+
+const locationRowStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "10px",
+  flexWrap: "wrap",
+  color: "#355e3b",
+  marginBottom: "30px",
+};
+
+const locationLabelStyle = {
+  fontWeight: "700",
+  marginRight: "6px",
+};
+
+const locationButtonStyle = {
+  background: "transparent",
+  border: "1px solid transparent",
+  color: "#2f6f44",
+  padding: "8px 10px",
+  cursor: "pointer",
+  fontWeight: "700",
+  fontSize: "0.85rem",
+};
+
+const activeLocationButtonStyle = {
+  color: "#2f6f44",
+  borderBottom: "2px solid #2f6f44",
+};
+
+const gridStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto",
+  padding: "0 20px",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "18px",
+};
+
+const cardStyle = {
+  backgroundColor: "white",
+  border: "1px solid #d5ead8",
+  borderRadius: "14px",
+  padding: "24px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "18px",
+  boxShadow: "0 4px 12px rgba(46, 139, 87, 0.08)",
+};
+
+const cardTitleStyle = {
+  fontSize: "1.6rem",
+  margin: "0 0 10px 0",
+  color: "#1f4d2e",
+};
+
+const cardLocationStyle = {
+  color: "#4f7a57",
+  fontSize: "0.95rem",
+  fontWeight: "600",
+  marginBottom: "14px",
+};
+
+const cardDescriptionStyle = {
+  color: "#355e3b",
+  lineHeight: "1.6",
+  fontSize: "0.97rem",
+  margin: 0,
+};
+
+const buttonGroupStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap",
+};
+
+const detailsButtonStyle = {
+  backgroundColor: "#edf8f0",
+  color: "#2e6b3a",
+  border: "1px solid #7bc47f",
+  padding: "12px 16px",
+  borderRadius: "8px",
+  fontWeight: "700",
+  cursor: "pointer",
+};
+
+const matchButtonStyle = {
+  backgroundColor: "#2e8b57",
+  color: "white",
+  border: "none",
+  padding: "12px 16px",
+  borderRadius: "8px",
+  fontWeight: "800",
+  cursor: "pointer",
+};
+
+const detailsBoxStyle = {
+  marginTop: "4px",
+  padding: "16px",
+  borderRadius: "10px",
+  backgroundColor: "#f3fbf5",
+  border: "1px solid #cfe7d4",
+};
+
+const detailsHeadingStyle = {
+  margin: "0 0 8px 0",
+  color: "#1f4d2e",
+  fontSize: "1rem",
+};
+
+const detailsTextStyle = {
+  margin: 0,
+  color: "#355e3b",
+  lineHeight: "1.6",
+};
+
+const emptyStateStyle = {
+  gridColumn: "1 / -1",
+  textAlign: "center",
+  padding: "40px 20px",
+  color: "#355e3b",
+  border: "1px solid #d5ead8",
+  backgroundColor: "white",
+  borderRadius: "12px",
 };
 
 export default ProgramsPage;
