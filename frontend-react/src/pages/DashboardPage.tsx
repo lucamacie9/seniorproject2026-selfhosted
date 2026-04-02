@@ -70,9 +70,10 @@ function DashboardPage() {
     >
       <section
         style={{
-          border: '1px solid #e5e7eb',
+          border: "1px solid #7bc47f",
           borderRadius: 12,
-          background: '#ffffff',
+          backgroundColor: "#edf8f0",
+          color: "#2e6b3a",
           padding: '1.25rem',
         }}
       >
