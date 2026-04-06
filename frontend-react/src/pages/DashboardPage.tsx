@@ -60,6 +60,8 @@ function DashboardPage() {
   return (
     <div
       style={{
+        minHeight: '100vh',
+        backgroundColor: '#f7faf8',
         maxWidth: 980,
         margin: '0 auto',
         padding: '2.5rem 1rem',
@@ -70,15 +72,15 @@ function DashboardPage() {
     >
       <section
         style={{
-          border: "1px solid #7bc47f",
+          border: '1px solid #c9e5d4',
           borderRadius: 12,
-          backgroundColor: "#edf8f0",
-          color: "#2e6b3a",
+          background: 'linear-gradient(135deg, #f5fff5 0%, #e8f8e7 55%, #dff1dc 100%)',
+          color: '#1f5f3f',
           padding: '1.25rem',
         }}
       >
         <h1 style={{ margin: 0, fontSize: '1.75rem' }}>Director Dashboard</h1>
-        <p style={{ margin: '0.5rem 0 0 0', color: '#4b5563' }}>
+        <p style={{ margin: '0.5rem 0 0 0', color: '#355e3b' }}>
           Overview of transfer credit activity and quick access to management areas.
         </p>
       </section>
@@ -94,14 +96,14 @@ function DashboardPage() {
           <div
             key={card.label}
             style={{
-              border: '1px solid #e5e7eb',
+              border: '1px solid #dfe7e2',
               borderRadius: 12,
               background: '#fff',
               padding: '1rem',
             }}
           >
-            <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>{card.label}</p>
-            <p style={{ margin: '0.25rem 0 0 0', fontSize: '1.5rem', fontWeight: 700 }}>
+            <p style={{ margin: 0, color: '#4f7a57', fontSize: '0.9rem' }}>{card.label}</p>
+            <p style={{ margin: '0.25rem 0 0 0', fontSize: '1.5rem', fontWeight: 700, color: '#1f4d2e' }}>
               {card.value}
             </p>
           </div>
@@ -109,10 +111,10 @@ function DashboardPage() {
       </section>
 
       <header style={{ textAlign: 'center' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem', color: '#1f4d2e' }}>
           Program Director Dashboard
         </h2>
-        <p style={{ color: '#666', margin: 0 }}>
+        <p style={{ color: '#355e3b', margin: 0 }}>
           Manage Institutions, Programs, Courses, and Knowledge Units
         </p>
       </header>
@@ -121,17 +123,17 @@ function DashboardPage() {
         <div
           key={section}
           style={{
-            border: '1px solid #e0e0e0',
+            border: '1px solid #dfe7e2',
             borderRadius: '12px',
             padding: '1.5rem',
             backgroundColor: '#fff',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 8px 24px rgba(16, 24, 40, 0.04)',
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
           }}
         >
-          <h2 style={{ fontSize: '1.2rem', marginBottom: '0.75rem' }}>{section}</h2>
+          <h2 style={{ fontSize: '1.2rem', marginBottom: '0.75rem', color: '#1f4d2e' }}>{section}</h2>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <input
@@ -146,7 +148,9 @@ function DashboardPage() {
                 height: 38,
                 padding: '0 0.75rem',
                 borderRadius: '8px',
-                border: '1px solid #cfcfcf',
+                border: '1px solid #cad8cf',
+                backgroundColor: '#fff',
+                color: '#111827',
                 outline: 'none',
               }}
             />
@@ -158,7 +162,7 @@ function DashboardPage() {
                 padding: '0 1rem',
                 borderRadius: '8px',
                 border: 'none',
-                backgroundColor: '#111827',
+                backgroundColor: '#2f7e41',
                 color: '#fff',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -170,11 +174,11 @@ function DashboardPage() {
 
           <div
             style={{
-              border: '1px dashed #ddd',
+              border: '1px dashed #cfe2d4',
               borderRadius: '8px',
               padding: '0.5rem',
               minHeight: 60,
-              backgroundColor: '#fcfcfc',
+              backgroundColor: '#f9fcfa',
             }}
           >
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
@@ -183,7 +187,8 @@ function DashboardPage() {
                   key={i}
                   style={{
                     padding: '0.25rem 0',
-                    borderBottom: '1px solid #eee',
+                    borderBottom: '1px solid #e3ebe5',
+                    color: '#4b5563',
                   }}
                 >
                   {'name' in item
@@ -207,14 +212,14 @@ function DashboardPage() {
       >
         <div
           style={{
-            border: '1px solid #e5e7eb',
+            border: '1px solid #dfe7e2',
             borderRadius: 12,
             background: '#fff',
             padding: '1rem',
           }}
         >
-          <h2 style={{ marginTop: 0 }}>Management Shortcuts</h2>
-          <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#374151', lineHeight: 1.8 }}>
+          <h2 style={{ marginTop: 0, color: '#1f4d2e' }}>Management Shortcuts</h2>
+          <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#355e3b', lineHeight: 1.8 }}>
             <li>Review institution profiles</li>
             <li>Maintain program equivalencies</li>
             <li>Validate course-to-course mappings</li>
@@ -224,14 +229,14 @@ function DashboardPage() {
 
         <div
           style={{
-            border: '1px solid #e5e7eb',
+            border: '1px solid #dfe7e2',
             borderRadius: 12,
             background: '#fff',
             padding: '1rem',
           }}
         >
-          <h2 style={{ marginTop: 0 }}>Recent Updates</h2>
-          <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#374151', lineHeight: 1.6 }}>
+          <h2 style={{ marginTop: 0, color: '#1f4d2e' }}>Recent Updates</h2>
+          <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#355e3b', lineHeight: 1.6 }}>
             {recentUpdates.map((update) => (
               <li key={update}>{update}</li>
             ))}
