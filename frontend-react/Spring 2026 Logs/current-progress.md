@@ -3,26 +3,61 @@
 Log of changes and progress for teammates. Intended to be committed and pushed with the repo as development continues.
 
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
+
+## 2026-04-06
+
+### Dashboard Page Update 
+
+**Dashboard Page**
+- Dashboard Page implementation - Matthew Gebara
+- Added metric cards displaying totals for each section
+- Structured sections using card based layout for consistency 
+- Added input fields with add functionality for creating new entries
+- Displayed placeholder data for testing 
+
+---
 ## 2026-04-01
 
 ### Programs and Match Page Update 
-Programs and Match Page implementation - Giselle Rodriguez 
 
-**Programs page**
-- Redesigned the `/programs` page with updated layout and structure
-- Placeholder Roosevelt program cards (Program 1, Program 2, Program 3) for demo and layout purposes
-- Search functionality for filtering visible programs
-- Location filter options (All, Chicago, Schaumburg, Online)
-- Expandable **View Course Details** behavior for each program card to display placeholder course descriptions
--  **Start Matching** button on each card to route users to the `/match` page
-
-### Match Page Update
+**Match Page**
+- Match Page implementation - Giselle Rodriguez 
 - Updated the `/match` page layout to match Programs page styling 
 - Search and dropdown selection for both **From Course** and **To Course** fields
 - Placeholder course options (Course 1-6) for demo/testing purposes
 - Mock matching behavior to display **Full Match**, **Partial Match**, or **No Match** results
 - **Save Transfer Plan** functionality
 - **Saved Transfer Plans** section so users can view saved selections after saving
+
+**Programs Page**
+- Programs page implementation - Giselle Rodriguez
+- Placeholder Roosevelt program cards (Program 1, Program 2, Program 3) for demo and layout purposes
+- Search functionality for filtering visible programs
+- Location filter options (All, Chicago, Schaumburg, Online)
+- Expandable **View Course Details** behavior for each program card to display placeholder course descriptions
+-  **Start Matching** button on each card to route users to the `/match` page
+
+---
+## 2026-03-31
+
+### Landing and About Page Update
+
+**Landing Page**
+- Landing Page implementation - Sabrina Aldakka 
+- Added introductory section and primary action cards 
+- Updated layout and design to match the other pages
+- Styled cards with consistent layout 
+- **Learn More** button routes users to the `/about` page
+- **Start Matching** button routes users to the `/match` page
+- **View Programs** button routes users to the `/programs` page 
+
+**About Page**
+- About Page implementation - Natalia Smiech
+- Structured page with card based layout 
+- Updated layout and design to match existing pages 
+- Added step by step explanation of how the system processes transfer credits 
+- **Try the match tool** button routes users to the `/match` page
+- **Start matching your credits** button routes users to the `/match` page 
 
 ---
 ## 2026-03-26
@@ -35,18 +70,19 @@ Programs and Match Page implementation - Giselle Rodriguez
   - Target program filtering based on selected target institution
   - Confirm action and summary display
 - Integration behavior uses backend endpoints for institutions and programs.
+
+---
 ## 2026-03-18
 
 ### Login & Registration Pages Update 
-Login Page Implementation - Darius Gillard
-
-Registration Page Implementation - Giselle Rodriguez
 
 **Login Page**
+- Login Page implementation - Darius Gillard
 - Implemented login form with email and password inputs
 - Validation to show generic error messaging ("Invalid email or password")
 
 **Registration Page** 
+- Registration Page implementation - Giselle Rodriguez 
 - Implemented create account form with required input field
 - Password requirement messaging (minimum length)
 
@@ -67,7 +103,38 @@ Registration Page Implementation - Giselle Rodriguez
 - **Folders:** `src/pages/`, `src/components/layout/`, `src/components/shared/` (and placeholders for `services/`, `types/`). Skeleton is the base for Sprint 2 (real Navbar/Footer) and later sprints.
 
 ---
+## 2026-02-24
 
+### Global Navigation, Loading indicators and API error handling
+
+**Loading indicators**
+- Loading indicators - Matthew Gebara
+- Implemented loading states across multiple pages
+  - Dashboard
+  - Institutions
+  - Programs
+  - Match
+- Displayed Loading messages while data is being fetched
+
+**API error handling**
+- API error handling implementation - Matthew Gebara
+- Added error handling for all failed API requests
+- Displayed user-friendly error messages when requests fail
+- Implemented retry button to allow users to reload data 
+
+**Global Navigation**
+- Global Navigation Implementation - Abaad Zaheer
+- Implemented global layout structure with navigation bar/ main content areas 
+- Added navigation links for
+  - Home
+  - Dashboard
+  - Institutions
+  - Programs
+  - Match
+  - About
+- Added authentication links (Login, Register) aligned seperately 
+
+---
 ## 2026-02-15
 
 ### About page and Spring 2026 Logs
