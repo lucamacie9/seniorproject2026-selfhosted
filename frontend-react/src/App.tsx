@@ -19,7 +19,7 @@ function RequireAdmin({ children }: { children: JSX.Element }) {
     return <Navigate to="/login" replace />
   }
 
-  if (role !== 'admin') {
+  if (role !== 'admin' && role !== 'director') {
     return <Navigate to="/" replace />
   }
 

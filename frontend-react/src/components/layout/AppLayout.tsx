@@ -8,7 +8,7 @@ function AppLayout() {
   const navigate = useNavigate();
   const { role, isLoggedIn, setRole } = useRoleView();
   const { theme, toggleTheme } = useTheme();
-  const canAccessDirectorView = isLoggedIn && role === 'admin';
+  const canAccessDirectorView = isLoggedIn && (role === 'admin' || role === 'director');
 
   const linkStyle: React.CSSProperties = {
     color: '#fff',

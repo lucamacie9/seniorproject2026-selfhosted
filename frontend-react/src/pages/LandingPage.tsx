@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 function LandingPage() {
   return (
     <div
@@ -108,7 +110,7 @@ function LandingPage() {
 }
 
 
-const cardStyle = {
+const cardStyle: CSSProperties = {
   border: '1px solid #d5ead8',
   borderRadius: '14px',
   padding: '1.2rem',
@@ -119,20 +121,20 @@ const cardStyle = {
   boxShadow: '0 4px 12px rgba(46, 139, 87, 0.08)',
 }
 
-const imageStyle = {
+const imageStyle: CSSProperties = {
   width: '100%',
   height: 150,
   objectFit: 'cover',
   borderRadius: '10px',
 }
 
-const cardTitleStyle = {
+const cardTitleStyle: CSSProperties = {
   fontSize: '1.2rem',
   color: '#1f4d2e',
   margin: '0.2rem 0',
 }
 
-const cardDescriptionStyle = {
+const cardDescriptionStyle: CSSProperties = {
   color: '#355e3b',
   fontSize: '0.95rem',
   lineHeight: '1.5',
@@ -140,7 +142,7 @@ const cardDescriptionStyle = {
 }
 
 
-const cardButtonStyle = {
+const cardButtonStyle: CSSProperties = {
   marginTop: 'auto',
   backgroundColor: "#edf8f0",
   color: "#2e6b3a",

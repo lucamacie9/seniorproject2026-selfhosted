@@ -1,13 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRoleView } from '../context/RoleViewContext';
-
-const statCards = [
-  { label: 'Institutions', value: 12 },
-  { label: 'Programs', value: 34 },
-  { label: 'Courses', value: 186 },
-  { label: 'Knowledge Units', value: 92 },
-];
+import { basicAuthHeader, getJson } from '../lib/api';
 
 const sections = ['Institutions', 'Programs', 'Courses', 'Knowledge Units'] as const;
 type Section = (typeof sections)[number];
@@ -26,9 +20,64 @@ const recentUpdates = [
   'Institution profile approved for Northern Tech.',
 ];
 
+type StatRow = { label: string; value: string };
+
 function DashboardPage() {
   const navigate = useNavigate();
-  const { role, setRole } = useRoleView();
+  const { role, setRole, authEmail, authPassword } = useRoleView();
+  const [statCards, setStatCards] = useState<StatRow[]>([
+    { label: 'Institutions', value: '—' },
+    { label: 'Programs', value: '—' },
+    { label: 'Courses', value: '—' },
+    { label: 'Knowledge Units', value: '—' },
+  ]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const [institutions, programs, kuList] = await Promise.all([
+          getJson<unknown[]>('/api/institutions'),
+          getJson<unknown[]>('/api/programs'),
+          getJson<unknown[]>('/api/knowledge_units'),
+        ]);
+        let coursesCount: number | null = null;
+        if (authEmail && authPassword) {
+          try {
+            const courses = await getJson<unknown[]>('/api/courses', {
+              headers: basicAuthHeader(authEmail, authPassword),
+            });
+            coursesCount = courses?.length ?? 0;
+          } catch {
+            coursesCount = null;
+          }
+        }
+        if (cancelled) return;
+        setStatCards([
+          { label: 'Institutions', value: String(institutions?.length ?? 0) },
+          { label: 'Programs', value: String(programs?.length ?? 0) },
+          {
+            label: 'Courses',
+            value: coursesCount === null ? 'Login as admin/director' : String(coursesCount),
+          },
+          { label: 'Knowledge Units', value: String(kuList?.length ?? 0) },
+        ]);
+      } catch {
+        if (!cancelled) {
+          setStatCards([
+            { label: 'Institutions', value: '?' },
+            { label: 'Programs', value: '?' },
+            { label: 'Courses', value: '?' },
+            { label: 'Knowledge Units', value: '?' },
+          ]);
+        }
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [authEmail, authPassword]);
   const [data, setData] = useState<DataState>({
     Institutions: [{ name: 'University A' }, { name: 'College B' }],
     Programs: [{ name: 'Cybersecurity' }, { name: 'IT Networking' }],
@@ -103,7 +152,8 @@ function DashboardPage() {
         }}
       >
         <p style={{ margin: 0, color: '#355e3b', fontWeight: 600 }}>
-          Current role view: {role === 'admin' ? 'Admin (Director)' : 'Student'}
+          Current role view:{' '}
+          {role === 'admin' ? 'Admin' : role === 'director' ? 'Director' : 'Student'}
         </p>
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button

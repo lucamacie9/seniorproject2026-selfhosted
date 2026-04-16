@@ -5,6 +5,24 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
 
 ---
+## 2026-04-15
+
+### Full-stack auth and API wiring (session)
+
+**Frontend**
+- Shared API helpers in `src/lib/api.ts`: `apiUrl` (relative `/api` in dev vs optional `VITE_API_BASE` in production), Basic auth header builder, `getJson` / `postJson` / `postJsonText`, `ApiError`, and `parseRoleFromLoginMessage` for Spring plain-text login success messages.
+- Vite dev proxy: `/api` → `http://localhost:8080` (`vite.config.ts`).
+- `LoginPage` posts to `/api/auth/login`, derives role from the response, updates `RoleViewContext` (login state and credentials for secured calls), routes directors/admins to `/dashboard` and students to `/`.
+
+**Backend (Spring)**
+- Security and CORS configuration aligned with the SPA: public `/api/auth/**`, role-based access on other `/api/**` routes, JDBC authentication against the `users` table.
+
+**Repo / delivery**
+- Changes prepared to push to `origin` and the class preview repository (`ru-transfer-site-preview-2026`).
+
+*— Luca M, April 15, 2026*
+
+---
 ## 2026-04-06
 
 ### Dashboard Page Update 
