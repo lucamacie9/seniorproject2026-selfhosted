@@ -6,9 +6,12 @@ import { useTheme } from '../../context/ThemeContext';
 
 function AppLayout() {
   const navigate = useNavigate();
-  const { role, isLoggedIn, setRole } = useRoleView();
+  const { role, isLoggedIn, authEmail, setRole } = useRoleView();
   const { theme, toggleTheme } = useTheme();
   const canAccessDirectorView = isLoggedIn && (role === 'admin' || role === 'director');
+  const loginIdentity =
+    authEmail?.trim() ||
+    `${role.charAt(0).toUpperCase()}${role.slice(1)} user`;
 
   const linkStyle: React.CSSProperties = {
     color: '#fff',
@@ -62,6 +65,23 @@ function AppLayout() {
             alignItems: 'center',
           }}
         >
+          {isLoggedIn && (
+            <span
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                border: '1px solid rgba(255, 255, 255, 0.35)',
+                borderRadius: '999px',
+                padding: '0.3rem 0.7rem',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
+              title={loginIdentity}
+            >
+              Logged in as {loginIdentity}
+            </span>
+          )}
+
           {/*dark and light mode theme toggle */}
           <button
             onClick={toggleTheme}
