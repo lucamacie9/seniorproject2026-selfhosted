@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useLocation } from "react-router-dom";
+import { Autocomplete, type AutocompleteItem } from "../components/Autocomplete";
 import { useRoleView } from "../context/RoleViewContext";
 import { ApiError, basicAuthHeader, getJson, postJsonText } from "../lib/api";
 
@@ -35,6 +36,10 @@ type SavedPlan = {
   toCourse: string;
 };
 
+type CourseAutocompleteItem = AutocompleteItem & {
+  courseId: number;
+};
+
 function MatchPage() {
   const location = useLocation();
   const { authEmail, authPassword, isLoggedIn, role } = useRoleView();
@@ -46,6 +51,8 @@ function MatchPage() {
     useState<ApiCoursesLoadState>("idle");
   const [apiFromCourseId, setApiFromCourseId] = useState("");
   const [apiToCourseId, setApiToCourseId] = useState("");
+  const [apiFromQuery, setApiFromQuery] = useState("");
+  const [apiToQuery, setApiToQuery] = useState("");
   const [manualFromId, setManualFromId] = useState("");
   const [manualToId, setManualToId] = useState("");
   const [serverMatchMessage, setServerMatchMessage] = useState("");
@@ -102,6 +109,40 @@ function MatchPage() {
 
   const formatCourseLabel = (c: ApiCourse) =>
     `${c.courseCode} — ${c.courseName} (id ${c.courseId})`;
+
+  const transferAutocompleteOptions = useMemo<CourseAutocompleteItem[]>(
+    () =>
+      transferCourseOptions.map((course) => ({
+        id: course.courseId,
+        courseId: course.courseId,
+        label: formatCourseLabel(course),
+        description: `Institution ${course.institutionId}, Program ${course.programId}, ${course.credits} credits`,
+      })),
+    [transferCourseOptions]
+  );
+
+  const targetAutocompleteOptions = useMemo<CourseAutocompleteItem[]>(
+    () =>
+      targetCourseOptions.map((course) => ({
+        id: course.courseId,
+        courseId: course.courseId,
+        label: formatCourseLabel(course),
+        description: `Institution ${course.institutionId}, Program ${course.programId}, ${course.credits} credits`,
+      })),
+    [targetCourseOptions]
+  );
+
+  const loadAutocompleteOptions = (
+    options: CourseAutocompleteItem[],
+    query: string
+  ): Promise<CourseAutocompleteItem[]> => {
+    const q = query.trim().toLowerCase();
+    if (!q) return Promise.resolve([]);
+    const filtered = options
+      .filter((item) => item.label.toLowerCase().includes(q))
+      .slice(0, 20);
+    return Promise.resolve(filtered);
+  };
 
   const handleBackendMatch = async () => {
     setServerMatchError("");
@@ -327,6 +368,10 @@ function MatchPage() {
   const handleReset = () => {
     setFromSearch("");
     setToSearch("");
+    setApiFromQuery("");
+    setApiToQuery("");
+    setApiFromCourseId("");
+    setApiToCourseId("");
     setSelectedFromCourses([]);
     setSelectedToCourse("");
     setMatchResult("");
@@ -429,33 +474,37 @@ function MatchPage() {
           <div style={{ ...gridStyle, marginTop: 12 }}>
             <div style={panelStyle}>
               <h4 style={panelHeadingStyle}>Transfer course (from)</h4>
-              <select
-                value={apiFromCourseId}
-                onChange={(e) => setApiFromCourseId(e.target.value)}
-                style={selectStyle}
-              >
-                <option value="">Select course</option>
-                {transferCourseOptions.map((c) => (
-                  <option key={c.courseId} value={String(c.courseId)}>
-                    {formatCourseLabel(c)}
-                  </option>
-                ))}
-              </select>
+              <Autocomplete<CourseAutocompleteItem>
+                value={apiFromQuery}
+                onValueChange={setApiFromQuery}
+                loadOptions={(query) =>
+                  loadAutocompleteOptions(transferAutocompleteOptions, query)
+                }
+                onSelect={(item) => setApiFromCourseId(String(item.courseId))}
+                placeholder="Type transfer course code or name..."
+                minChars={1}
+                debounceMs={180}
+              />
+              <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
+                Selected ID: {apiFromCourseId || "None"}
+              </p>
             </div>
             <div style={panelStyle}>
               <h4 style={panelHeadingStyle}>Target course (to)</h4>
-              <select
-                value={apiToCourseId}
-                onChange={(e) => setApiToCourseId(e.target.value)}
-                style={selectStyle}
-              >
-                <option value="">Select course</option>
-                {targetCourseOptions.map((c) => (
-                  <option key={c.courseId} value={String(c.courseId)}>
-                    {formatCourseLabel(c)}
-                  </option>
-                ))}
-              </select>
+              <Autocomplete<CourseAutocompleteItem>
+                value={apiToQuery}
+                onValueChange={setApiToQuery}
+                loadOptions={(query) =>
+                  loadAutocompleteOptions(targetAutocompleteOptions, query)
+                }
+                onSelect={(item) => setApiToCourseId(String(item.courseId))}
+                placeholder="Type Roosevelt course code or name..."
+                minChars={1}
+                debounceMs={180}
+              />
+              <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
+                Selected ID: {apiToCourseId || "None"}
+              </p>
             </div>
           </div>
         )}
@@ -547,10 +596,16 @@ function MatchPage() {
             <input
               type="text"
               placeholder="Search transfer courses..."
+              list="transfer-course-suggestions"
               value={fromSearch}
               onChange={(e) => setFromSearch(e.target.value)}
               style={inputStyle}
             />
+            <datalist id="transfer-course-suggestions">
+              {currentProgramData.fromCourses.map((course) => (
+                <option key={course} value={course} />
+              ))}
+            </datalist>
 
             <div style={checkboxListStyle}>
               {filteredFromCourses.map((course) => (
@@ -571,10 +626,16 @@ function MatchPage() {
             <input
               type="text"
               placeholder="Search Roosevelt courses..."
+              list="roosevelt-course-suggestions"
               value={toSearch}
               onChange={(e) => setToSearch(e.target.value)}
               style={inputStyle}
             />
+            <datalist id="roosevelt-course-suggestions">
+              {currentProgramData.toCourses.map((course) => (
+                <option key={course} value={course} />
+              ))}
+            </datalist>
 
             <select
               value={selectedToCourse}
