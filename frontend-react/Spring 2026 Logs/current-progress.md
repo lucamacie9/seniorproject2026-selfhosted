@@ -5,6 +5,28 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
 
 ---
+## 2026-04-27
+
+### Transcript Upload 
+
+- **Transcript upload functionality** - Giselle Rodriguez
+- Created new "Upload Transcript" section styled consistently with other cards
+- File input field supports .pdf, .doc, .docx, .txt
+- Confirmation message and file name displays after upload 
+
+---
+## 2026-04-26
+
+### Autocomplete Search
+
+- **AutoComplete Search implementation** - Yinka Yussuf, Darius Gillard
+- Replaced Basic dropdown course selection with dynamic autocomplete search inputs
+- Integrated reusable Autocomplete component for course search
+- Mapped API course data into searchable options
+- Implemented debounced search input
+- Added filtering logic to return matching results based on user input
+
+---
 ## 2026-04-15
 
 ### Full-stack auth and API wiring (session)
@@ -23,12 +45,41 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 *— Luca M, April 15, 2026*
 
 ---
+## 2026-04-14
+
+### Light and Dark Mode
+
+- **Light and Dak Mode implementation** - Sabrina Aldakka
+- Added theme context - light/dark
+- Added toggle button in navigation
+  - switches between light and dark mode
+  - updates automatically on toggle 
+- Includes icon change - sun/moon
+- Updated light/dark mode to different shades of green
+
+---
+## 2026-04-13
+
+### Role Based Access Update
+
+- **Role Based Access Routing** - Matthew Gebara
+- Only Admins can access director view dashboard, hides access from students
+- Redirects
+  - not logged in - login page
+  - not admin - home page
+- Added role switch feature
+  - can toggle between student and admin
+  - used for testing different views
+- Updated Dashboard
+  - shows current role
+  - buttons to switch role 
+
+---
 ## 2026-04-06
 
 ### Dashboard Page Update 
 
-**Dashboard Page**
-- Dashboard Page implementation - Matthew Gebara
+- **Dashboard Page implementation** - Matthew Gebara
 - Added metric cards displaying totals for each section
 - Structured sections using card based layout for consistency 
 - Added input fields with add functionality for creating new entries
@@ -94,10 +145,6 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 ## 2026-03-18
 
 ### Login & Registration Pages Update + Validation
-
-Login Page Implementation - Darius Gillard
-
-Registration Page Implementation - Giselle Rodriguez
 
 **Login Page**
 - Login Page implementation - Darius Gillard
