@@ -129,8 +129,7 @@ function DashboardPage() {
     <div
       style={{
         minHeight: '100vh',
-        background:
-          'linear-gradient(180deg, #f8fffb 0%, #ebfaef 52%, #d5f3de 75%, #c2eccc 100%)',
+        background: 'transparent',
         maxWidth: 1080,
         margin: '0 auto',
         padding: '2.25rem 1.25rem',
@@ -142,7 +141,7 @@ function DashboardPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(240px, 1.2fr) minmax(320px, 2fr)',
+          gridTemplateColumns: 'minmax(420px, 1.3fr) minmax(280px, 1fr)',
           gap: '1rem',
           alignItems: 'stretch',
         }}
@@ -154,6 +153,10 @@ function DashboardPage() {
             background: 'linear-gradient(145deg, #f9fffb 0%, #e5f8eb 62%, #d8f0df 100%)',
             padding: '1.2rem 1.15rem',
             boxShadow: '0 12px 28px rgba(33, 104, 61, 0.1)',
+            minHeight: 220,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
           }}
         >
           <p
@@ -175,16 +178,25 @@ function DashboardPage() {
             Overview of transfer credit activity and quick access to management areas.
           </p>
 
-          <div style={{ marginTop: '1.1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div
+            style={{
+              marginTop: '1.1rem',
+              display: 'flex',
+              gap: '0.45rem',
+              flexWrap: 'nowrap',
+              alignItems: 'center',
+            }}
+          >
             <span
               style={{
                 border: '1px solid #9ec7ab',
                 borderRadius: 999,
-                padding: '0.35rem 0.75rem',
-                fontSize: '0.8rem',
+                padding: '0.35rem 0.7rem',
+                fontSize: '0.76rem',
                 fontWeight: 700,
                 color: '#1b4f2c',
                 background: '#ecfaf0',
+                whiteSpace: 'nowrap',
               }}
             >
               Current role: {roleLabel}
@@ -197,9 +209,11 @@ function DashboardPage() {
                 border: role === 'admin' ? '1px solid #2f7e41' : '1px solid #bbd8c3',
                 background: role === 'admin' ? '#2f7e41' : '#ffffff',
                 color: role === 'admin' ? '#fff' : '#174125',
-                padding: '0.3rem 0.8rem',
+                padding: '0.3rem 0.65rem',
                 fontWeight: 700,
+                fontSize: '0.78rem',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
               }}
             >
               View as Admin
@@ -215,9 +229,11 @@ function DashboardPage() {
                 border: '1px solid #bbd8c3',
                 background: '#fff',
                 color: '#174125',
-                padding: '0.3rem 0.8rem',
+                padding: '0.3rem 0.65rem',
                 fontWeight: 700,
+                fontSize: '0.78rem',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
               }}
             >
               View as Student
@@ -228,7 +244,7 @@ function DashboardPage() {
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, minmax(120px, 1fr))',
+            gridTemplateColumns: 'repeat(2, minmax(130px, 1fr))',
             gap: '0.7rem',
             alignContent: 'start',
           }}
