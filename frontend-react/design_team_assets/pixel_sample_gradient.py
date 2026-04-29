@@ -16,6 +16,19 @@ Usage:
 Notes:
 - This does not "detect" the gradient mathematically; it reads actual rendered
   pixels from the provided PNG. That makes it great for matching mockups.
+
+Implementation note for `MatchPage` asymmetry (April 29):
+- The Match mock adds a right-side white wash over the sampled green gradient.
+- Keep the sampled base gradient stops unchanged, then layer a semi-opaque white
+  gradient above it in CSS.
+- Example:
+    background:
+      linear-gradient(120deg, rgba(255, 255, 255, 0.92) 58%,
+                              rgba(255, 255, 255, 0.7) 72%,
+                              rgba(255, 255, 255, 0) 88%),
+      var(--page-gradient);
+- This script still samples only the base image colors; the white wash is an
+  implementation overlay for visual composition, not a sampled source color.
 """
 
 from __future__ import annotations

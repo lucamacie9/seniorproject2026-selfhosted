@@ -872,7 +872,8 @@ function MatchPage() {
 
 const screenBackgroundStyle: CSSProperties = {
   padding: "36px 20px 56px",
-  background: "var(--page-gradient)",
+  background:
+    "linear-gradient(120deg, rgba(255, 255, 255, 0.92) 58%, rgba(255, 255, 255, 0.7) 72%, rgba(255, 255, 255, 0) 88%), var(--page-gradient)",
   minHeight: "100vh",
 };
 

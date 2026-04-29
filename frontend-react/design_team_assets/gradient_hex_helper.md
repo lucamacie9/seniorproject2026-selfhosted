@@ -68,6 +68,30 @@ To keep text legible, keep components on light, semi-opaque surfaces:
 }
 ```
 
+## Match Page Variant (Right-Side White Bias)
+
+For the `middleman/Match.png` look, keep the sampled green base gradient and add
+an angled white overlay on top. This creates the whiter upper-right area while
+the left side keeps the normal green transition.
+
+```css
+/* Layer 1: white wash overlay for right-side highlight
+   Layer 2: canonical sampled base gradient */
+background:
+  linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.92) 58%,
+    rgba(255, 255, 255, 0.7) 72%,
+    rgba(255, 255, 255, 0) 88%
+  ),
+  var(--page-gradient);
+```
+
+Why this works:
+- The base sampled stops still control the green palette.
+- The top white layer softens only the right upper/mid area.
+- Card text remains legible because cards still sit on white/light panel surfaces.
+
 ## Common Mistakes
 
 - Using a different middle stop than `#baf2d2` (visual drift from sampled design)
