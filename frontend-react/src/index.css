@@ -1,5 +1,5 @@
 :root {
-  --bg-color: #bdd3c3;
+  --bg-color: #d3bdbd;
   --text-color: #1b3a22;
 
   --nav-bg: #06582b;
@@ -8,27 +8,46 @@
   --link-color: #ffffff;
 }
 
+/* 🌙 DARK MODE VARIABLES */
 [data-theme="dark"] {
-  --bg-color: #2d4020d7;
+  --bg-color: #0f2416;  /* deep forest base */
   --text-color: #e6f2ea;
 
-  --nav-bg: #173905d7;
-  --footer-bg: #173905d7;
+  --nav-bg: #14331c;
+  --footer-bg: #14331c;
 
   --accent: #2e7d32;
 
-  --link-color: #bfe6c8;
+  --link-color: #cfead6;
 }
 
+/* 🌿 GLOBAL BACKGROUND */
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  min-height: 100vh;
+  color: #1b3a22;
+  transition: all 0.3s ease;
 }
 
-body,
-nav,
-footer,
-button {
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* LIGHT MODE BACKGROUND */
+html[data-theme="light"] body,
+body:not([data-theme="dark"]) {
+  background: radial-gradient(
+    circle at bottom left,
+    rgba(3, 203, 76, 0.22) 0%,
+    rgba(20, 211, 84, 0.915) 35%,
+    #ffffff 80%
+  );
+}
+
+/* DARK MODE BACKGROUND */
+html[data-theme="dark"] body {
+  background: radial-gradient(
+    circle at bottom left,
+    rgb(16, 50, 17) 0%,
+    rgba(1, 55, 0, 0.55) 35%,
+    rgba(19, 64, 19, 0.98) 85%
+  );
+
+  color: #03551e;
 }
