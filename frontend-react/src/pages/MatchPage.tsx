@@ -89,6 +89,24 @@ function MatchPage() {
     };
   }, [authEmail, authPassword]);
 
+  // Ensure the *entire screen* (global `body` background) matches the mock gradient.
+  // `index.css` sets a solid green `body { background-color: var(--bg-color) }`, which can show
+  // through around our page wrapper padding.
+  useEffect(() => {
+    const gradient =
+      "linear-gradient(180deg, #f7fcf8 0%, #baf2d2 50%, #a5ebb6 100%)";
+    const prevBackground = document.body.style.background;
+    const prevBackgroundColor = document.body.style.backgroundColor;
+
+    document.body.style.background = gradient;
+    document.body.style.backgroundColor = "transparent";
+
+    return () => {
+      document.body.style.background = prevBackground;
+      document.body.style.backgroundColor = prevBackgroundColor;
+    };
+  }, []);
+
   const { transferCourseOptions, targetCourseOptions } = useMemo(() => {
     if (!apiCourses.length) {
       return { transferCourseOptions: [], targetCourseOptions: [] };
@@ -108,7 +126,7 @@ function MatchPage() {
   }, [apiCourses, routeProgramId]);
 
   const formatCourseLabel = (c: ApiCourse) =>
-    `${c.courseCode} — ${c.courseName} (id ${c.courseId})`;
+    `${c.courseCode} — ${c.courseName}`;
 
   const transferAutocompleteOptions = useMemo<CourseAutocompleteItem[]>(
     () =>
@@ -116,7 +134,7 @@ function MatchPage() {
         id: course.courseId,
         courseId: course.courseId,
         label: formatCourseLabel(course),
-        description: `Institution ${course.institutionId}, Program ${course.programId}, ${course.credits} credits`,
+        description: `${course.credits} credits`,
       })),
     [transferCourseOptions]
   );
@@ -127,7 +145,7 @@ function MatchPage() {
         id: course.courseId,
         courseId: course.courseId,
         label: formatCourseLabel(course),
-        description: `Institution ${course.institutionId}, Program ${course.programId}, ${course.credits} credits`,
+        description: `${course.credits} credits`,
       })),
     [targetCourseOptions]
   );
@@ -148,7 +166,7 @@ function MatchPage() {
     setServerMatchError("");
     setServerMatchMessage("");
     if (!isLoggedIn || !authEmail || !authPassword) {
-      setServerMatchError("Log in to use the live match API (HTTP Basic).");
+      setServerMatchError("Sign in to run the live matching tool.");
       return;
     }
     const fromStr =
@@ -162,7 +180,7 @@ function MatchPage() {
     const courseIdFrom = Number(fromStr);
     const courseIdTo = Number(toStr);
     if (!Number.isFinite(courseIdFrom) || !Number.isFinite(courseIdTo)) {
-      setServerMatchError("Enter valid numeric course IDs for both courses.");
+      setServerMatchError("Enter the course numbers for both selections.");
       return;
     }
     setApiMatchSubmitting(true);
@@ -175,9 +193,15 @@ function MatchPage() {
       setServerMatchMessage(text);
     } catch (e) {
       if (e instanceof ApiError) {
-        setServerMatchError(e.body || `Request failed (${e.status})`);
+        // Don't expose internal status details to students.
+        console.error(e);
+        setServerMatchError(
+          "We couldn't find a match right now. Please check your selections and try again."
+        );
       } else {
-        setServerMatchError("Network error. Is the backend running?");
+        setServerMatchError(
+          "We couldn't reach the matching service. Please try again in a moment."
+        );
       }
     } finally {
       setApiMatchSubmitting(false);
@@ -432,52 +456,53 @@ function MatchPage() {
     };
   });
 
+  const matchesForChosenTo = selectedToCourse
+    ? selectedMappings.filter((m) => m.to === selectedToCourse)
+    : [];
+
   const alternativeCourses = currentProgramData.toCourses.filter(
     (course) => course !== selectedToCourse
   );
 
   return (
-    <div style={pageStyle}>
-      <div style={heroStyle}>
-        <h1 style={heroTitleStyle}>Match Courses</h1>
-        <p style={heroSubtitleStyle}>
-          Compare transfer courses to Roosevelt University requirements and build
-          a sample transfer plan.
-        </p>
-      </div>
+    <div style={screenBackgroundStyle}>
+      <div style={contentContainerStyle}>
+        <div style={heroStyle}>
+          <h1 style={heroTitleStyle}>Match Courses</h1>
+          <p style={heroSubtitleStyle}>
+            Compare transfer courses to Roosevelt University requirements and build
+            a sample transfer plan.
+          </p>
+        </div>
 
-      <div style={sectionCardStyle}>
-        <h3 style={sectionTitleStyle}>Live backend match</h3>
+        <div style={sectionCardStyle}>
+        <h3 style={sectionTitleStyle}>Live course matching</h3>
         <p style={{ ...summaryTextStyle, marginTop: 0 }}>
-          Uses <code>GET /api/courses</code> and <code>POST /api/match</code> on your local Spring
-          server (via Vite proxy). Course list requires an <strong>admin</strong> or{" "}
-          <strong>director</strong> account; students can still call match if they enter two course
-          IDs manually.
+          Compare courses using our matching service. Course options may require a staff account.
+          If you're a student, you can still run matching by entering course numbers manually.
         </p>
         {routeProgramName && (
           <p style={summaryTextStyle}>
-            <strong>Route context:</strong> {routeProgramName}
-            {routeProgramId != null ? ` (program id ${routeProgramId})` : ""}
+            <strong>Selected program:</strong> {routeProgramName}
           </p>
         )}
         {!isLoggedIn && (
           <p style={{ ...savedMessageStyle, color: "#9a6700" }}>
-            You are not logged in. Sign in so the app can send HTTP Basic credentials with API
-            requests.
+            You're not signed in yet. Sign in to access course options and run live matching.
           </p>
         )}
         {isLoggedIn && apiCoursesStatus === "loading" && (
-          <p style={summaryTextStyle}>Loading courses from API…</p>
+          <p style={summaryTextStyle}>Loading course options…</p>
         )}
         {apiCoursesStatus === "forbidden" && (
           <p style={{ ...savedMessageStyle, color: "#9a6700" }}>
-            Your account cannot list courses (403). Log in as director or admin to populate
-            dropdowns, or use manual course IDs below.
+            Your account can't load the course list. If you're a student, use the manual course
+            numbers below. Staff can sign in as admin or director to populate the dropdowns.
           </p>
         )}
         {apiCoursesStatus === "error" && (
           <p style={{ ...savedMessageStyle, color: "#b42318" }}>
-            Could not load courses. Check that the backend is running and you are logged in.
+            We couldn't load course options. Please make sure you're signed in and try again.
           </p>
         )}
         {apiCoursesStatus === "ok" && transferCourseOptions.length > 0 && (
@@ -496,7 +521,7 @@ function MatchPage() {
                 debounceMs={180}
               />
               <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
-                Selected ID: {apiFromCourseId || "None"}
+                Selected course number: {apiFromCourseId || "None"}
               </p>
             </div>
             <div style={panelStyle}>
@@ -513,7 +538,7 @@ function MatchPage() {
                 debounceMs={180}
               />
               <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
-                Selected ID: {apiToCourseId || "None"}
+                Selected course number: {apiToCourseId || "None"}
               </p>
             </div>
           </div>
@@ -524,7 +549,7 @@ function MatchPage() {
           isLoggedIn && (
           <div style={{ ...gridStyle, marginTop: 12 }}>
             <div style={panelStyle}>
-              <h4 style={panelHeadingStyle}>Transfer course ID (manual)</h4>
+              <h4 style={panelHeadingStyle}>Transfer course number (manual)</h4>
               <input
                 type="number"
                 placeholder="e.g. 1"
@@ -534,7 +559,7 @@ function MatchPage() {
               />
             </div>
             <div style={panelStyle}>
-              <h4 style={panelHeadingStyle}>Target course ID (manual)</h4>
+              <h4 style={panelHeadingStyle}>Target course number (manual)</h4>
               <input
                 type="number"
                 placeholder="e.g. 2"
@@ -547,7 +572,7 @@ function MatchPage() {
         )}
         {apiCoursesStatus === "ok" && role === "student" && (
           <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
-            Optional: you can still adjust IDs manually if needed.
+            If needed, you can enter course numbers manually.
           </p>
         )}
         <div style={{ ...buttonRowStyle, marginTop: 16 }}>
@@ -557,7 +582,7 @@ function MatchPage() {
             disabled={apiMatchSubmitting}
             onClick={handleBackendMatch}
           >
-            {apiMatchSubmitting ? "Requesting…" : "Get match from server"}
+            {apiMatchSubmitting ? "Finding match…" : "Find my match"}
           </button>
         </div>
         {serverMatchError && (
@@ -664,20 +689,20 @@ function MatchPage() {
 
         <div style={selectionSummaryStyle}>
           <p style={summaryTextStyle}>
-            <strong>Selected Transfer Course(s):</strong>{" "}
+            <strong>Your transfer courses:</strong>{" "}
             {selectedFromCourses.length > 0
               ? selectedFromCourses.join(", ")
               : "None selected"}
           </p>
           <p style={summaryTextStyle}>
-            <strong>Selected Roosevelt Course:</strong>{" "}
+            <strong>Chosen Roosevelt course:</strong>{" "}
             {selectedToCourse || "None selected"}
           </p>
         </div>
 
         <div style={buttonRowStyle}>
           <button style={primaryButtonStyle} onClick={handleMatch}>
-            Submit Match Request
+            Find my match
           </button>
           <button style={saveButtonStyle} onClick={handleSavePlan}>
             Save Transfer Plan
@@ -716,7 +741,8 @@ function MatchPage() {
       <div style={sectionCardStyle}>
         <h3 style={sectionTitleStyle}>Match Result</h3>
         <div style={{ ...resultBoxStyle, ...getResultStyle() }}>
-          {matchResult || "No result yet. Submit a match request to view results."}
+          {matchResult ||
+            'No results yet. Choose your courses and click "Find my match."'}
         </div>
 
         {matchResult && (
@@ -748,17 +774,17 @@ function MatchPage() {
 
             <div style={detailsGridStyle}>
               <div style={detailColumnStyle}>
-                <h5 style={detailSubheadingStyle}>Selected Transfer Course(s)</h5>
+                <h5 style={detailSubheadingStyle}>Your transfer courses</h5>
 
                 {selectedFromCourses.length > 0 ? (
                   selectedMappings.map((item) => (
                     <div key={item.course} style={detailItemStyle}>
                       <p style={detailTitleStyle}>{item.course}</p>
                       <p style={detailTextStyle}>
-                        <strong>Description:</strong>
+                        <strong>Best match to:</strong> {item.to}
                       </p>
                       <p style={detailTextStyle}>
-                        <strong>Credits:</strong>
+                        <strong>Match type:</strong> {item.type}
                       </p>
                     </div>
                   ))
@@ -768,16 +794,24 @@ function MatchPage() {
               </div>
 
               <div style={detailColumnStyle}>
-                <h5 style={detailSubheadingStyle}>Selected Roosevelt Course</h5>
+                <h5 style={detailSubheadingStyle}>Chosen Roosevelt course</h5>
 
                 {selectedToCourse ? (
                   <div style={detailItemStyle}>
                     <p style={detailTitleStyle}>{selectedToCourse}</p>
                     <p style={detailTextStyle}>
-                      <strong>Description:</strong>
+                      <strong>Matched from:</strong>{" "}
+                      {matchesForChosenTo.length
+                        ? matchesForChosenTo.map((m) => m.course).join(", ")
+                        : "No direct match from your selection."}
                     </p>
                     <p style={detailTextStyle}>
-                      <strong>Credits:</strong>
+                      <strong>Match type(s):</strong>{" "}
+                      {matchesForChosenTo.length
+                        ? Array.from(new Set(matchesForChosenTo.map((m) => m.type))).join(
+                            ", "
+                          )
+                        : "-"}
                     </p>
                   </div>
                 ) : (
@@ -789,16 +823,26 @@ function MatchPage() {
         )}
         {showAlternativeCourses && (
           <div style={detailsCardStyle}>
-            <h4 style={detailsHeadingStyle}>Other Roosevelt Course Options</h4>
+            <h4 style={detailsHeadingStyle}>Other Roosevelt course options</h4>
             <div style={detailsListStyle}>
               {alternativeCourses.map((course) => (
                 <div key={course} style={detailItemStyle}>
                   <p style={detailTitleStyle}>{course}</p>
                   <p style={detailTextStyle}>
-                    <strong>Description:</strong>
+                    <strong>Matched from:</strong>{" "}
+                    {selectedMappings
+                      .filter((m) => m.to === course)
+                      .map((m) => m.course)
+                      .join(", ") || "None"}
                   </p>
                   <p style={detailTextStyle}>
-                    <strong>Credits:</strong>
+                    <strong>Match type(s):</strong>{" "}
+                    {selectedMappings
+                      .filter((m) => m.to === course)
+                      .map((m) => m.type)
+                      .filter(Boolean)
+                      .filter((v, i, arr) => arr.indexOf(v) === i)
+                      .join(", ") || "-"}
                   </p>
                 </div>
               ))}
@@ -806,8 +850,8 @@ function MatchPage() {
           </div>
         )}
       </div>
-
-      <div style={sectionCardStyle}>
+ 
+        <div style={sectionCardStyle}>
         <h3 style={sectionTitleStyle}>Saved Transfer Plans</h3>
 
         {savedTransferPlans.length === 0 ? (
@@ -838,22 +882,27 @@ function MatchPage() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
 }
 
-const pageStyle: CSSProperties = {
+const screenBackgroundStyle: CSSProperties = {
   padding: "36px 20px 56px",
+  background:
+    "linear-gradient(180deg, #f7fcf8 0%, #baf2d2 50%, #a5ebb6 100%)",
+  minHeight: "100vh",
+};
+
+const contentContainerStyle: CSSProperties = {
   maxWidth: "1150px",
   margin: "0 auto",
-  backgroundColor: "#f7faf8",
-  minHeight: "100vh",
 };
 
 const heroStyle: CSSProperties = {
   background:
-    "linear-gradient(135deg, #f5fff5 0%, #e8f8e7 55%, #dff1dc 100%)",
+    "linear-gradient(180deg, #f7fcf8 0%, #baf2d2 50%, #a5ebb6 100%)",
   border: "1px solid #c9e5d4",
   borderRadius: "24px",
   padding: "42px 28px",

@@ -110,7 +110,7 @@ function RegisterPage() {
       if (e instanceof ApiError) {
         setRegisterError(e.body || 'Registration failed.');
       } else {
-        setRegisterError('Network error. Is the backend running on port 8080?');
+        setRegisterError('We could not reach the server right now. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

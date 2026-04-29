@@ -78,7 +78,7 @@ function LoginPage() {
       if (e instanceof ApiError) {
         setLoginError(e.body || 'Login failed.');
       } else {
-        setLoginError('Network error. Is the backend running on port 8080?');
+        setLoginError('We could not reach the server right now. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

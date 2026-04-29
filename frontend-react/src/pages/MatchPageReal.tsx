@@ -99,15 +99,15 @@ function MatchPageReal() {
       const hasPartialMatch = matchResults.some(r => r.result.includes('%') && !r.result.includes('100%'));
 
       if (hasFullMatch) {
-        setMatchResult("Full Match Found! One or more courses have complete knowledge unit overlap. Save your transfer plan.");
+        setMatchResult("Full Match ✅\nGreat news! Your courses line up with your Roosevelt requirement. Save your transfer plan.");
       } else if (hasPartialMatch) {
-        setMatchResult("Partial Match Found! Some knowledge units overlap, but you may need additional courses. Browse other courses to complete your match.");
+        setMatchResult("Partial Match ⚠️\nYou have a strong match. You may need additional courses. Browse other options to complete your plan.");
       } else {
-        setMatchResult("No Match Found! No significant knowledge unit overlap detected. Browse other courses to find your match.");
+        setMatchResult("No Match ❌\nWe didn't find a strong match with your current choices. Try different courses to see better options.");
       }
     } catch (error) {
       console.error('Match calculation failed:', error);
-      setMatchResult("Failed to calculate match. Please try again.");
+      setMatchResult("We couldn't calculate a match right now. Please try again.");
     }
   };
 
@@ -198,8 +198,7 @@ function MatchPageReal() {
       <div style={heroStyle}>
         <h1 style={heroTitleStyle}>Match Courses</h1>
         <p style={heroSubtitleStyle}>
-          Compare transfer courses to Roosevelt University requirements using knowledge unit matching and build
-          a sample transfer plan.
+          Compare transfer courses to Roosevelt University requirements and build a sample transfer plan.
         </p>
       </div>
 
@@ -276,7 +275,7 @@ function MatchPageReal() {
 
         <div style={selectionSummaryStyle}>
           <p style={summaryTextStyle}>
-            <strong>Selected Transfer Course(s):</strong>{" "}
+            <strong>Your transfer courses:</strong>{" "}
             {selectedFromCourses.length > 0
               ? selectedFromCourses.map(id => {
                   const course = courses.find(c => c.courseId === id);
@@ -285,7 +284,7 @@ function MatchPageReal() {
               : "None selected"}
           </p>
           <p style={summaryTextStyle}>
-            <strong>Selected Roosevelt Course:</strong>{" "}
+            <strong>Chosen Roosevelt course:</strong>{" "}
             {selectedToCourse ? (() => {
                 const course = courses.find(c => c.courseId === selectedToCourse);
                 return course ? `${course.courseCode}: ${course.courseName}` : '';
@@ -295,7 +294,7 @@ function MatchPageReal() {
 
         <div style={buttonRowStyle}>
           <button style={primaryButtonStyle} onClick={handleMatch}>
-            Calculate Match
+            Find my match
           </button>
           <button style={saveButtonStyle} onClick={handleSavePlan}>
             Save Transfer Plan
@@ -311,7 +310,7 @@ function MatchPageReal() {
       <div style={sectionCardStyle}>
         <h3 style={sectionTitleStyle}>Match Result</h3>
         <div style={{ ...resultBoxStyle, ...getResultStyle() }}>
-          {matchResult || "No result yet. Submit a match request to view results."}
+          {matchResult || 'No results yet. Choose your courses and click "Find my match."'}
         </div>
 
         {matchResult && (
@@ -330,7 +329,7 @@ function MatchPageReal() {
             <h4 style={detailsHeadingStyle}>Course Details</h4>
             <div style={detailsGridStyle}>
               <div style={detailColumnStyle}>
-                <h5 style={detailSubheadingStyle}>Selected Transfer Course(s)</h5>
+                <h5 style={detailSubheadingStyle}>Your transfer courses</h5>
                 {selectedFromCourses.length > 0 ? (
                   selectedFromCourses.map((courseId) => {
                     const course = courses.find(c => c.courseId === courseId);
@@ -348,7 +347,7 @@ function MatchPageReal() {
               </div>
 
               <div style={detailColumnStyle}>
-                <h5 style={detailSubheadingStyle}>Selected Roosevelt Course</h5>
+                <h5 style={detailSubheadingStyle}>Chosen Roosevelt course</h5>
                 {selectedToCourse ? (() => {
                   const course = courses.find(c => c.courseId === selectedToCourse);
                   return course ? (
