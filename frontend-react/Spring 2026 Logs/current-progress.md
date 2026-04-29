@@ -15,6 +15,7 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 - Refined `/match` to use the shared gradient token and removed page-specific body background override logic.
 - Added frontend design asset directory content under `frontend-react/design_team_assets/` for team handoff/reference.
 - Added gradient sampling utility `frontend-react/design_team_assets/pixel_sample_gradient.py` for color extraction/testing from source images.
+- Added `frontend-react/design_team_assets/gradient_hex_helper.md` documenting canonical sampled hex stops and correct implementation patterns for page backgrounds and component surfaces.
 
 *— lucamacie9, April 29, 2026*
 
