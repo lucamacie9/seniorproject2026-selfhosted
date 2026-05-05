@@ -1,6 +1,44 @@
-import { useEffect, useMemo, useState } from "react";
-import type { CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useLocation } from "react-router-dom";
+import { Autocomplete, type AutocompleteItem } from "../components/Autocomplete";
+import { useRoleView } from "../context/RoleViewContext";
+import { ApiError, basicAuthHeader, getJson, postJsonText } from "../lib/api";
+
+type ApiCourse = {
+  courseId: number;
+  courseCode: string;
+  courseName: string;
+  programId: number;
+  institutionId: number;
+  credits: number;
+};
+
+type ApiCoursesLoadState = "idle" | "loading" | "ok" | "forbidden" | "error";
+
+type DemoProgramKey =
+  | "Program 1"
+  | "Program 2"
+  | "Program 3"
+  | "Program 4"
+  | "Program 5"
+  | "Program 6";
+
+type DemoProgramData = {
+  fromCourses: string[];
+  toCourses: string[];
+  matches: Record<string, { to: string; type: string }>;
+};
+
+type SavedPlan = {
+  id: number;
+  program: string;
+  fromCourses: string[];
+  toCourse: string;
+};
+
+type CourseAutocompleteItem = AutocompleteItem & {
+  courseId: number;
+};
 
 type MatchInfo = { to: string; type: string };
 
@@ -21,8 +59,149 @@ type MatchLocationState = { selectedProgram?: string };
 
 function MatchPage() {
   const location = useLocation();
+  const { authEmail, authPassword, isLoggedIn, role } = useRoleView();
+  const routeProgramId = location.state?.programId as number | undefined;
+  const routeProgramName = location.state?.programName as string | undefined;
 
-  const sharedProgramData: ProgramCourseData = {
+  const [apiCourses, setApiCourses] = useState<ApiCourse[]>([]);
+  const [apiCoursesStatus, setApiCoursesStatus] =
+    useState<ApiCoursesLoadState>("idle");
+  const [apiFromCourseId, setApiFromCourseId] = useState("");
+  const [apiToCourseId, setApiToCourseId] = useState("");
+  const [apiFromQuery, setApiFromQuery] = useState("");
+  const [apiToQuery, setApiToQuery] = useState("");
+  const [manualFromId, setManualFromId] = useState("");
+  const [manualToId, setManualToId] = useState("");
+  const [serverMatchMessage, setServerMatchMessage] = useState("");
+  const [serverMatchError, setServerMatchError] = useState("");
+  const [apiMatchSubmitting, setApiMatchSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!authEmail || !authPassword) {
+      setApiCoursesStatus("idle");
+      setApiCourses([]);
+      return;
+    }
+    let cancelled = false;
+    setApiCoursesStatus("loading");
+    getJson<ApiCourse[]>("/api/courses", {
+      headers: basicAuthHeader(authEmail, authPassword),
+    })
+      .then((data) => {
+        if (cancelled) return;
+        setApiCourses(data ?? []);
+        setApiCoursesStatus("ok");
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        if (e instanceof ApiError && e.status === 403) {
+          setApiCoursesStatus("forbidden");
+        } else {
+          setApiCoursesStatus("error");
+        }
+        setApiCourses([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authEmail, authPassword]);
+
+  const { transferCourseOptions, targetCourseOptions } = useMemo(() => {
+    if (!apiCourses.length) {
+      return { transferCourseOptions: [], targetCourseOptions: [] };
+    }
+    if (routeProgramId != null) {
+      const target = apiCourses.filter((c) => c.programId === routeProgramId);
+      const transfer = apiCourses.filter((c) => c.programId !== routeProgramId);
+      return {
+        transferCourseOptions: transfer,
+        targetCourseOptions: target.length ? target : apiCourses,
+      };
+    }
+    return {
+      transferCourseOptions: apiCourses,
+      targetCourseOptions: apiCourses,
+    };
+  }, [apiCourses, routeProgramId]);
+
+  const formatCourseLabel = (c: ApiCourse) =>
+    `${c.courseCode} — ${c.courseName} (id ${c.courseId})`;
+
+  const transferAutocompleteOptions = useMemo<CourseAutocompleteItem[]>(
+    () =>
+      transferCourseOptions.map((course) => ({
+        id: course.courseId,
+        courseId: course.courseId,
+        label: formatCourseLabel(course),
+        description: `Institution ${course.institutionId}, Program ${course.programId}, ${course.credits} credits`,
+      })),
+    [transferCourseOptions]
+  );
+
+  const targetAutocompleteOptions = useMemo<CourseAutocompleteItem[]>(
+    () =>
+      targetCourseOptions.map((course) => ({
+        id: course.courseId,
+        courseId: course.courseId,
+        label: formatCourseLabel(course),
+        description: `Institution ${course.institutionId}, Program ${course.programId}, ${course.credits} credits`,
+      })),
+    [targetCourseOptions]
+  );
+
+  const loadAutocompleteOptions = (
+    options: CourseAutocompleteItem[],
+    query: string
+  ): Promise<CourseAutocompleteItem[]> => {
+    const q = query.trim().toLowerCase();
+    if (!q) return Promise.resolve([]);
+    const filtered = options
+      .filter((item) => item.label.toLowerCase().includes(q))
+      .slice(0, 20);
+    return Promise.resolve(filtered);
+  };
+
+  const handleBackendMatch = async () => {
+    setServerMatchError("");
+    setServerMatchMessage("");
+    if (!isLoggedIn || !authEmail || !authPassword) {
+      setServerMatchError("Log in to use the live match API (HTTP Basic).");
+      return;
+    }
+    const fromStr =
+      apiCoursesStatus === "ok" && apiFromCourseId
+        ? apiFromCourseId
+        : manualFromId.trim();
+    const toStr =
+      apiCoursesStatus === "ok" && apiToCourseId
+        ? apiToCourseId
+        : manualToId.trim();
+    const courseIdFrom = Number(fromStr);
+    const courseIdTo = Number(toStr);
+    if (!Number.isFinite(courseIdFrom) || !Number.isFinite(courseIdTo)) {
+      setServerMatchError("Enter valid numeric course IDs for both courses.");
+      return;
+    }
+    setApiMatchSubmitting(true);
+    try {
+      const text = await postJsonText(
+        "/api/match",
+        { courseIdFrom, courseIdTo },
+        { headers: basicAuthHeader(authEmail, authPassword) }
+      );
+      setServerMatchMessage(text);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setServerMatchError(e.body || `Request failed (${e.status})`);
+      } else {
+        setServerMatchError("Network error. Is the backend running?");
+      }
+    } finally {
+      setApiMatchSubmitting(false);
+    }
+  };
+
+  const sharedProgramData: DemoProgramData = {
     fromCourses: [
       "Course 1",
       "Course 2",
@@ -42,7 +221,7 @@ function MatchPage() {
     },
   };
 
-  const programCourseData: Record<string, ProgramCourseData> = {
+  const programCourseData: Record<DemoProgramKey, DemoProgramData> = {
     "Program 1": sharedProgramData,
     "Program 2": sharedProgramData,
     "Program 3": sharedProgramData,
@@ -51,16 +230,18 @@ function MatchPage() {
     "Program 6": sharedProgramData,
   };
 
-  const programOptions = Object.keys(programCourseData);
+  const programOptions = Object.keys(programCourseData) as DemoProgramKey[];
 
-  const navState = location.state as MatchLocationState | null;
-  const initialProgram =
-    navState?.selectedProgram &&
-    programCourseData[navState.selectedProgram]
-      ? navState.selectedProgram
+  function isDemoProgramKey(name: string): name is DemoProgramKey {
+    return Object.prototype.hasOwnProperty.call(programCourseData, name);
+  }
+
+  const initialProgram: DemoProgramKey =
+    location.state?.selectedProgram && isDemoProgramKey(String(location.state.selectedProgram))
+      ? String(location.state.selectedProgram) as DemoProgramKey
       : "Program 1";
 
-  const [program, setProgram] = useState(initialProgram);
+  const [program, setProgram] = useState<DemoProgramKey>(initialProgram);
   const [fromSearch, setFromSearch] = useState("");
   const [toSearch, setToSearch] = useState("");
   const [selectedFromCourses, setSelectedFromCourses] = useState<string[]>([]);
@@ -69,9 +250,9 @@ function MatchPage() {
   const [showCourseDetails, setShowCourseDetails] = useState(false);
   const [showAlternativeCourses, setShowAlternativeCourses] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
-  const [savedTransferPlans, setSavedTransferPlans] = useState<
-    SavedTransferPlan[]
-  >([]);
+  const [savedTransferPlans, setSavedTransferPlans] = useState<SavedPlan[]>([]);
+  const [transcriptFile, setTranscriptFile] = useState<File | null>(null);
+  const [transcriptMessage, setTranscriptMessage] = useState("");
 
   const currentProgramData = programCourseData[program]!;
 
@@ -206,6 +387,10 @@ function MatchPage() {
   const handleReset = () => {
     setFromSearch("");
     setToSearch("");
+    setApiFromQuery("");
+    setApiToQuery("");
+    setApiFromCourseId("");
+    setApiToCourseId("");
     setSelectedFromCourses([]);
     setSelectedToCourse("");
     setMatchResult("");
@@ -216,6 +401,14 @@ function MatchPage() {
 
   const handleRemovePlan = (id: number) => {
     setSavedTransferPlans((prev) => prev.filter((plan) => plan.id !== id));
+  };
+
+  const handleTranscriptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setTranscriptFile(file);
+      setTranscriptMessage(`Transcript uploaded: ${file.name}`);
+    }
   };
 
   const getResultStyle = (): CSSProperties => {
@@ -270,12 +463,146 @@ function MatchPage() {
         </p>
       </div>
 
+      <div style={sectionCardStyle}>
+        <h3 style={sectionTitleStyle}>Live backend match</h3>
+        <p style={{ ...summaryTextStyle, marginTop: 0 }}>
+          Uses <code>GET /api/courses</code> and <code>POST /api/match</code> on your local Spring
+          server (via Vite proxy). Course list requires an <strong>admin</strong> or{" "}
+          <strong>director</strong> account; students can still call match if they enter two course
+          IDs manually.
+        </p>
+        {routeProgramName && (
+          <p style={summaryTextStyle}>
+            <strong>Route context:</strong> {routeProgramName}
+            {routeProgramId != null ? ` (program id ${routeProgramId})` : ""}
+          </p>
+        )}
+        {!isLoggedIn && (
+          <p style={{ ...savedMessageStyle, color: "#9a6700" }}>
+            You are not logged in. Sign in so the app can send HTTP Basic credentials with API
+            requests.
+          </p>
+        )}
+        {isLoggedIn && apiCoursesStatus === "loading" && (
+          <p style={summaryTextStyle}>Loading courses from API…</p>
+        )}
+        {apiCoursesStatus === "forbidden" && (
+          <p style={{ ...savedMessageStyle, color: "#9a6700" }}>
+            Your account cannot list courses (403). Log in as director or admin to populate
+            dropdowns, or use manual course IDs below.
+          </p>
+        )}
+        {apiCoursesStatus === "error" && (
+          <p style={{ ...savedMessageStyle, color: "#b42318" }}>
+            Could not load courses. Check that the backend is running and you are logged in.
+          </p>
+        )}
+        {apiCoursesStatus === "ok" && transferCourseOptions.length > 0 && (
+          <div style={{ ...gridStyle, marginTop: 12 }}>
+            <div style={panelStyle}>
+              <h4 style={panelHeadingStyle}>Transfer course (from)</h4>
+              <Autocomplete<CourseAutocompleteItem>
+                value={apiFromQuery}
+                onValueChange={setApiFromQuery}
+                loadOptions={(query) =>
+                  loadAutocompleteOptions(transferAutocompleteOptions, query)
+                }
+                onSelect={(item) => setApiFromCourseId(String(item.courseId))}
+                placeholder="Type transfer course code or name..."
+                minChars={1}
+                debounceMs={180}
+              />
+              <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
+                Selected ID: {apiFromCourseId || "None"}
+              </p>
+            </div>
+            <div style={panelStyle}>
+              <h4 style={panelHeadingStyle}>Target course (to)</h4>
+              <Autocomplete<CourseAutocompleteItem>
+                value={apiToQuery}
+                onValueChange={setApiToQuery}
+                loadOptions={(query) =>
+                  loadAutocompleteOptions(targetAutocompleteOptions, query)
+                }
+                onSelect={(item) => setApiToCourseId(String(item.courseId))}
+                placeholder="Type Roosevelt course code or name..."
+                minChars={1}
+                debounceMs={180}
+              />
+              <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
+                Selected ID: {apiToCourseId || "None"}
+              </p>
+            </div>
+          </div>
+        )}
+        {(apiCoursesStatus === "forbidden" ||
+          apiCoursesStatus === "idle" ||
+          apiCoursesStatus === "error") &&
+          isLoggedIn && (
+          <div style={{ ...gridStyle, marginTop: 12 }}>
+            <div style={panelStyle}>
+              <h4 style={panelHeadingStyle}>Transfer course ID (manual)</h4>
+              <input
+                type="number"
+                placeholder="e.g. 1"
+                value={manualFromId}
+                onChange={(e) => setManualFromId(e.target.value)}
+                style={inputStyle}
+              />
+            </div>
+            <div style={panelStyle}>
+              <h4 style={panelHeadingStyle}>Target course ID (manual)</h4>
+              <input
+                type="number"
+                placeholder="e.g. 2"
+                value={manualToId}
+                onChange={(e) => setManualToId(e.target.value)}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+        )}
+        {apiCoursesStatus === "ok" && role === "student" && (
+          <p style={{ ...summaryTextStyle, fontSize: "0.9rem" }}>
+            Optional: you can still adjust IDs manually if needed.
+          </p>
+        )}
+        <div style={{ ...buttonRowStyle, marginTop: 16 }}>
+          <button
+            type="button"
+            style={primaryButtonStyle}
+            disabled={apiMatchSubmitting}
+            onClick={handleBackendMatch}
+          >
+            {apiMatchSubmitting ? "Requesting…" : "Get match from server"}
+          </button>
+        </div>
+        {serverMatchError && (
+          <p style={{ ...savedMessageStyle, color: "#b42318", marginTop: 12 }}>
+            {serverMatchError}
+          </p>
+        )}
+        {serverMatchMessage && (
+          <div
+            style={{
+              ...resultBoxStyle,
+              marginTop: 12,
+              backgroundColor: "#edfdf4",
+              border: "1px solid #b7ebc6",
+              color: "#166534",
+            }}
+          >
+            {serverMatchMessage}
+          </div>
+        )}
+      </div>
+
       <div style={summaryCardStyle}>
         <div style={programRowStyle}>
           <label style={programLabelStyle}>Selected Roosevelt Program</label>
           <select
             value={program}
-            onChange={(e) => setProgram(e.target.value)}
+            onChange={(e) => setProgram(e.target.value as DemoProgramKey)}
             style={programSelectStyle}
           >
             {programOptions.map((programName) => (
@@ -296,10 +623,16 @@ function MatchPage() {
             <input
               type="text"
               placeholder="Search transfer courses..."
+              list="transfer-course-suggestions"
               value={fromSearch}
               onChange={(e) => setFromSearch(e.target.value)}
               style={inputStyle}
             />
+            <datalist id="transfer-course-suggestions">
+              {currentProgramData.fromCourses.map((course) => (
+                <option key={course} value={course} />
+              ))}
+            </datalist>
 
             <div style={checkboxListStyle}>
               {filteredFromCourses.map((course) => (
@@ -320,10 +653,16 @@ function MatchPage() {
             <input
               type="text"
               placeholder="Search Roosevelt courses..."
+              list="roosevelt-course-suggestions"
               value={toSearch}
               onChange={(e) => setToSearch(e.target.value)}
               style={inputStyle}
             />
+            <datalist id="roosevelt-course-suggestions">
+              {currentProgramData.toCourses.map((course) => (
+                <option key={course} value={course} />
+              ))}
+            </datalist>
 
             <select
               value={selectedToCourse}
@@ -366,6 +705,29 @@ function MatchPage() {
         </div>
 
         {savedMessage && <p style={savedMessageStyle}>{savedMessage}</p>}
+      </div>
+
+      <div style={sectionCardStyle}>
+        <h3 style={sectionTitleStyle}>Upload Transcript</h3>
+        <p style={{ ...summaryTextStyle, marginTop: 0 }}>
+          Upload your transcript to build your transfer plan easier 
+        </p>
+        <div style={{ marginBottom: "16px" }}>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.txt"
+            onChange={handleTranscriptUpload}
+            style={fileInputStyle}
+          />
+        </div>
+        {transcriptFile && (
+          <div style={{ ...resultBoxStyle, marginBottom: "16px", backgroundColor: "#edfdf4", border: "1px solid #b7ebc6", color: "#166534" }}>
+            ✓ {transcriptFile.name} selected
+          </div>
+        )}
+        {transcriptMessage && (
+          <p style={{ ...savedMessageStyle, color: "#166534" }}>{transcriptMessage}</p>
+        )}
       </div>
 
       <div style={sectionCardStyle}>
@@ -784,6 +1146,17 @@ const plansListStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: "14px",
+};
+
+const fileInputStyle: CSSProperties = {
+  width: "100%",
+  padding: "12px 14px",
+  borderRadius: "12px",
+  border: "1px solid #cad8cf",
+  backgroundColor: "#fff",
+  outline: "none",
+  boxSizing: "border-box",
+  cursor: "pointer",
 };
 
 const planCardStyle: CSSProperties = {

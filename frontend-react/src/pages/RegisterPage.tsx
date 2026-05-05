@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ApiError, postJsonText } from '../lib/api';
 
 type RegisterFormData = {
   firstName: string;
@@ -20,6 +21,7 @@ type RegisterFormErrors = {
 };
 
 function RegisterPage() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormData>({
     firstName: '',
     lastName: '',
@@ -32,7 +34,9 @@ function RegisterPage() {
   const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [registerError, setRegisterError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = (): RegisterFormErrors => {
     const newErrors: RegisterFormErrors = {};
@@ -82,15 +86,34 @@ function RegisterPage() {
     }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const validationErrors = validateForm();
     setErrors(validationErrors);
-    setSubmitted(true);
+    setRegisterError('');
+    setRegisterSuccess('');
 
-    if (Object.keys(validationErrors).length === 0) {
-      console.log('Registration form submitted:', formData);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    setIsSubmitting(true);
+    try {
+      const message = await postJsonText('/api/auth/register', {
+        name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+        email: formData.email.trim(),
+        password: formData.password,
+        role: formData.role,
+      });
+      setRegisterSuccess(message);
+      setTimeout(() => navigate('/login'), 1500);
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setRegisterError(e.body || 'Registration failed.');
+      } else {
+        setRegisterError('Network error. Is the backend running on port 8080?');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,6 +154,34 @@ function RegisterPage() {
           gap: '1.25rem',
         }}
       >
+        {registerError && (
+          <div
+            style={{
+              background: '#fdecea',
+              border: '1px solid #f5c2c7',
+              color: '#b42318',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+            }}
+          >
+            {registerError}
+          </div>
+        )}
+        {registerSuccess && (
+          <div
+            style={{
+              background: '#ecfdf3',
+              border: '1px solid #6ee7b7',
+              color: '#166534',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+            }}
+          >
+            {registerSuccess}
+          </div>
+        )}
         <div
           style={{
             display: 'grid',
@@ -244,7 +295,7 @@ function RegisterPage() {
           >
             <option value="">Select your role</option>
             <option value="student">Student</option>
-            <option value="programDirector">Program Director</option>
+            <option value="director">Program Director</option>
             <option value="admin">Administrator</option>
           </select>
           {errors.role && (
@@ -361,19 +412,20 @@ function RegisterPage() {
 
         <button
           type="submit"
+          disabled={isSubmitting}
           style={{
             height: 46,
             borderRadius: '999px',
             border: 'none',
-            backgroundColor: '#111827',
+            backgroundColor: isSubmitting ? '#6b7280' : '#111827',
             color: '#ffffff',
             fontSize: '1rem',
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
             marginTop: '0.25rem',
           }}
         >
-          Create account
+          {isSubmitting ? 'Creating account…' : 'Create account'}
         </button>
 
         <p
@@ -397,18 +449,6 @@ function RegisterPage() {
           </Link>
         </p>
 
-        {submitted && Object.keys(errors).length === 0 && (
-          <p
-            style={{
-              margin: 0,
-              textAlign: 'center',
-              color: 'green',
-              fontSize: '0.95rem',
-            }}
-          >
-            Registration form passed validation.
-          </p>
-        )}
       </form>
     </div>
   );

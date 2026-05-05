@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getJson } from '../lib/api'
 
 type Institution = {
   institutionId: number | string
@@ -13,14 +15,13 @@ type Program = {
   programName: string
 }
 
-const BASE_API_URL = 'http://localhost:8080/api'
-
 function formatInstitutionLabel(inst?: Institution) {
   if (!inst) return ''
   return inst.name + (inst.location ? ` (${inst.location})` : '')
 }
 
 function InstitutionsPage() {
+  const navigate = useNavigate()
   const [institutions, setInstitutions] = useState<Institution[]>([])
   const [allPrograms, setAllPrograms] = useState<Program[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,18 +55,21 @@ function InstitutionsPage() {
     setError(null)
 
     Promise.all([
-      fetch(`${BASE_API_URL}/institutions`).then((r) => r.json()),
-      fetch(`${BASE_API_URL}/programs`).then((r) => r.json()),
+      getJson<Institution[]>('/api/institutions'),
+      getJson<Program[]>('/api/programs'),
     ])
       .then(([loadedInstitutions, loadedPrograms]) => {
         if (cancelled) return
-        setInstitutions((loadedInstitutions ?? []) as Institution[])
-        setAllPrograms((loadedPrograms ?? []) as Program[])
+        setInstitutions(loadedInstitutions ?? [])
+        setAllPrograms(loadedPrograms ?? [])
         setSelectionSummary('Select your current and target institutions, then a target program.')
       })
       .catch((err) => {
         if (cancelled) return
-        const msg = `Error loading institutions/programs: ${String(err)}`
+        const msg =
+          err instanceof Error
+            ? `Error loading institutions/programs: ${err.message}`
+            : `Error loading institutions/programs: ${String(err)}`
         setError(msg)
         setSelectionSummary(msg)
         setInstitutions([])
@@ -125,6 +129,18 @@ function InstitutionsPage() {
     setSelectionSummary(
       `Current: ${currentLabel} → Target: ${targetLabel} | Target Program: ${targetProgramLabel}`,
     )
+
+    const programId = targetProgram ? Number(targetProgram.id ?? targetProgram.programId) : undefined
+    if (programId !== undefined && !Number.isNaN(programId)) {
+      navigate('/match', {
+        state: {
+          programId,
+          programName: targetProgramLabel,
+          currentInstitutionId: Number(currentInstitutionId),
+          targetInstitutionId: Number(targetInstitutionId),
+        },
+      })
+    }
   }
 
   return (

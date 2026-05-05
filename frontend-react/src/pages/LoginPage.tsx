@@ -1,5 +1,8 @@
 import { FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useRoleView } from '../context/RoleViewContext';
+import { ApiError, parseRoleFromLoginMessage, postJsonText } from '../lib/api';
+import type { Role } from '../context/RoleViewContext';
 
 type LoginFormData = {
   email: string;
@@ -12,6 +15,8 @@ type LoginFormErrors = {
 };
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const { setIsLoggedIn, setRole, setAuthSession } = useRoleView();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -19,8 +24,8 @@ function LoginPage() {
 
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const validateForm = (): LoginFormErrors => {
     const newErrors: LoginFormErrors = {};
 
@@ -48,18 +53,37 @@ function LoginPage() {
       [field]: undefined,
     }));
   };
-const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const validationErrors = validateForm();
-  setErrors(validationErrors);
-  setSubmitted(true);
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
 
-  if (Object.keys(validationErrors).length === 0) {
     setLoginError('');
-    console.log('Login form submitted:', formData);
-  }
-};
+    setIsSubmitting(true);
+    try {
+      const message = await postJsonText('/api/auth/login', {
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+      const parsed = parseRoleFromLoginMessage(message);
+      const role: Role = parsed ?? 'student';
+      setRole(role);
+      setAuthSession(formData.email.trim(), formData.password);
+      setIsLoggedIn(true);
+      if (role === 'admin' || role === 'director') navigate('/dashboard');
+      else navigate('/');
+    } catch (e) {
+      if (e instanceof ApiError) {
+        setLoginError(e.body || 'Login failed.');
+      } else {
+        setLoginError('Network error. Is the backend running on port 8080?');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div
       style={{
@@ -230,19 +254,20 @@ const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 
         <button
           type="submit"
+          disabled={isSubmitting}
           style={{
             height: 46,
             borderRadius: '999px',
             border: 'none',
-            backgroundColor: '#111827',
+            backgroundColor: isSubmitting ? '#6b7280' : '#111827',
             color: '#ffffff',
             fontSize: '1rem',
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
             marginTop: '0.25rem',
           }}
         >
-          Sign in
+          {isSubmitting ? 'Signing in…' : 'Sign in'}
         </button>
 
         <p
@@ -266,18 +291,6 @@ const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
           </Link>
         </p>
 
-        {submitted && Object.keys(errors).length === 0 && (
-          <p
-            style={{
-              margin: 0,
-              textAlign: 'center',
-              color: 'green',
-              fontSize: '0.95rem',
-            }}
-          >
-            Login form passed validation.
-          </p>
-        )}
       </form>
     </div>
   );

@@ -5,27 +5,129 @@ Log of changes and progress for teammates. Intended to be committed and pushed w
 **Location:** This log lives under `frontend-react/Spring 2026 Logs/` so all frontend deliverables (code + docs) are in one place when pushing to origin.
 
 ---
+## 2026-04-27
 
+### Transcript Upload 
+
+- **Transcript upload functionality** - Giselle Rodriguez
+- Created new "Upload Transcript" section styled consistently with other cards
+- File input field supports .pdf, .doc, .docx, .txt
+- Confirmation message and file name displays after upload 
+
+---
+## 2026-04-26
+
+### Autocomplete Search
+
+- **AutoComplete Search implementation** - Yinka Yussuf, Darius Gillard
+- Replaced Basic dropdown course selection with dynamic autocomplete search inputs
+- Integrated reusable Autocomplete component for course search
+- Mapped API course data into searchable options
+- Implemented debounced search input
+- Added filtering logic to return matching results based on user input
+
+---
+## 2026-04-15
+
+### Full-stack auth and API wiring (session)
+
+**Frontend**
+- Shared API helpers in `src/lib/api.ts`: `apiUrl` (relative `/api` in dev vs optional `VITE_API_BASE` in production), Basic auth header builder, `getJson` / `postJson` / `postJsonText`, `ApiError`, and `parseRoleFromLoginMessage` for Spring plain-text login success messages.
+- Vite dev proxy: `/api` → `http://localhost:8080` (`vite.config.ts`).
+- `LoginPage` posts to `/api/auth/login`, derives role from the response, updates `RoleViewContext` (login state and credentials for secured calls), routes directors/admins to `/dashboard` and students to `/`.
+
+**Backend (Spring)**
+- Security and CORS configuration aligned with the SPA: public `/api/auth/**`, role-based access on other `/api/**` routes, JDBC authentication against the `users` table.
+
+**Repo / delivery**
+- Changes prepared to push to `origin` and the class preview repository (`ru-transfer-site-preview-2026`).
+
+*— Luca M, April 15, 2026*
+
+---
+## 2026-04-14
+
+### Light and Dark Mode
+
+- **Light and Dak Mode implementation** - Sabrina Aldakka
+- Added theme context - light/dark
+- Added toggle button in navigation
+  - switches between light and dark mode
+  - updates automatically on toggle 
+- Includes icon change - sun/moon
+- Updated light/dark mode to different shades of green
+
+---
+## 2026-04-13
+
+### Role Based Access Update
+
+- **Role Based Access Routing** - Matthew Gebara
+- Only Admins can access director view dashboard, hides access from students
+- Redirects
+  - not logged in - login page
+  - not admin - home page
+- Added role switch feature
+  - can toggle between student and admin
+  - used for testing different views
+- Updated Dashboard
+  - shows current role
+  - buttons to switch role 
+
+---
+## 2026-04-06
+
+### Dashboard Page Update 
+
+- **Dashboard Page implementation** - Matthew Gebara
+- Added metric cards displaying totals for each section
+- Structured sections using card based layout for consistency 
+- Added input fields with add functionality for creating new entries
+- Displayed placeholder data for testing 
+
+---
 ## 2026-04-01
 
 ### Programs and Match Page Update 
-Programs and Match Page implementation - Giselle Rodriguez 
 
-**Programs page**
-- Redesigned the `/programs` page with updated layout and structure
-- Placeholder Roosevelt program cards (Program 1, Program 2, Program 3) for demo and layout purposes
-- Search functionality for filtering visible programs
-- Location filter options (All, Chicago, Schaumburg, Online)
-- Expandable **View Course Details** behavior for each program card to display placeholder course descriptions
--  **Start Matching** button on each card to route users to the `/match` page
-
-### Match Page Update
+**Match Page**
+- Match Page implementation - Giselle Rodriguez 
 - Updated the `/match` page layout to match Programs page styling 
 - Search and dropdown selection for both **From Course** and **To Course** fields
 - Placeholder course options (Course 1-6) for demo/testing purposes
 - Mock matching behavior to display **Full Match**, **Partial Match**, or **No Match** results
 - **Save Transfer Plan** functionality
 - **Saved Transfer Plans** section so users can view saved selections after saving
+
+**Programs Page**
+- Programs page implementation - Giselle Rodriguez
+- Placeholder Roosevelt program cards (Program 1, Program 2, Program 3) for demo and layout purposes
+- Search functionality for filtering visible programs
+- Location filter options (All, Chicago, Schaumburg, Online)
+- Expandable **View Course Details** behavior for each program card to display placeholder course descriptions
+-  **Start Matching** button on each card to route users to the `/match` page
+
+---
+## 2026-03-31
+
+### Landing and About Page Update
+
+**Landing Page**
+- Landing Page implementation - Sabrina Aldakka 
+- Added introductory section and primary action cards 
+- Updated layout and design to match the other pages
+- Styled cards with consistent layout 
+- **Learn More** button routes users to the `/about` page
+- **Start Matching** button routes users to the `/match` page
+- **View Programs** button routes users to the `/programs` page 
+
+**About Page**
+- About Page implementation - Natalia Smiech
+- Structured page with card based layout 
+- Updated layout and design to match existing pages 
+- Added step by step explanation of how the system processes transfer credits 
+- **Try the match tool** button routes users to the `/match` page
+- **Start matching your credits** button routes users to the `/match` page 
 
 ---
 ## 2026-03-26
@@ -38,19 +140,19 @@ Programs and Match Page implementation - Giselle Rodriguez
   - Target program filtering based on selected target institution
   - Confirm action and summary display
 - Integration behavior uses backend endpoints for institutions and programs.
+
+---
 ## 2026-03-18
 
 ### Login & Registration Pages Update + Validation
 
-Login Page Implementation - Darius Gillard
-
-Registration Page Implementation - Giselle Rodriguez
-
 **Login Page**
+- Login Page implementation - Darius Gillard
 - Implemented login form with email and password inputs
 - Validation to show generic error messaging ("Invalid email or password")
 
 **Registration Page** 
+- Registration Page implementation - Giselle Rodriguez 
 - Implemented create account form with required input field
 - Password requirement messaging (minimum length)
 
@@ -71,7 +173,38 @@ Registration Page Implementation - Giselle Rodriguez
 - **Folders:** `src/pages/`, `src/components/layout/`, `src/components/shared/` (and placeholders for `services/`, `types/`). Skeleton is the base for Sprint 2 (real Navbar/Footer) and later sprints.
 
 ---
+## 2026-02-24
 
+### Global Navigation, Loading indicators and API error handling
+
+**Loading indicators**
+- Loading indicators - Matthew Gebara
+- Implemented loading states across multiple pages
+  - Dashboard
+  - Institutions
+  - Programs
+  - Match
+- Displayed Loading messages while data is being fetched
+
+**API error handling**
+- API error handling implementation - Matthew Gebara
+- Added error handling for all failed API requests
+- Displayed user-friendly error messages when requests fail
+- Implemented retry button to allow users to reload data 
+
+**Global Navigation**
+- Global Navigation Implementation - Abaad Zaheer
+- Implemented global layout structure with navigation bar/ main content areas 
+- Added navigation links for
+  - Home
+  - Dashboard
+  - Institutions
+  - Programs
+  - Match
+  - About
+- Added authentication links (Login, Register) aligned seperately 
+
+---
 ## 2026-02-15
 
 ### About page and Spring 2026 Logs
