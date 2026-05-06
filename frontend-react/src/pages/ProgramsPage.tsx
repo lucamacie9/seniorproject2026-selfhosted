@@ -20,7 +20,14 @@ type ProgramRow = {
   type: string
   location: string
   description: string
-  programDetails: string
+  institutionName: string
+}
+
+type ApiCourse = {
+  courseId: number
+  courseCode: string
+  courseName: string
+  credits: number
 }
 
 function ProgramsPage() {
@@ -31,7 +38,18 @@ function ProgramsPage() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedLocation, setSelectedLocation] = useState('All')
+  const [selectedType, setSelectedType] = useState('All')
   const [expandedProgramId, setExpandedProgramId] = useState<number | null>(null)
+  const [programCourses, setProgramCourses] = useState<Record<number, ApiCourse[]>>({})
+  const [coursesLoading, setCoursesLoading] = useState<Record<number, boolean>>({})
+
+  function deriveProgramType(programName: string): string {
+    const n = programName.toLowerCase()
+    if (n.includes('certificate')) return 'Certificate'
+    if (n.includes('master') || n.includes('mba') || n.includes('ms ') || n.includes('m.s')) return 'Graduate'
+    if (n.includes('doctor') || n.includes('phd')) return 'Doctoral'
+    return 'Undergraduate'
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -49,10 +67,10 @@ function ProgramsPage() {
           return {
             id: p.programId,
             name: p.programName,
-            type: '',
+            type: deriveProgramType(p.programName),
             location: loc,
             description: `Program at ${instName}.`,
-            programDetails: `Institution: ${instName}. Transfer credit matching uses courses linked to this program in the database.`,
+            institutionName: instName,
           }
         })
         setPrograms(rows)
@@ -85,10 +103,17 @@ function ProgramsPage() {
         program.description.toLowerCase().includes(searchTerm.toLowerCase())
 
       const matchesLocation = selectedLocation === 'All' || program.location === selectedLocation
+      const matchesType = selectedType === 'All' || program.type === selectedType
 
-      return matchesSearch && matchesLocation
+      return matchesSearch && matchesLocation && matchesType
     })
-  }, [programs, searchTerm, selectedLocation])
+  }, [programs, searchTerm, selectedLocation, selectedType])
+
+  const typeOptions = useMemo(() => {
+    const set = new Set<string>()
+    programs.forEach((program) => set.add(program.type))
+    return ['All', ...Array.from(set).sort()]
+  }, [programs])
 
   const handleStartMatching = (program: ProgramRow) => {
     navigate('/match', {
@@ -100,8 +125,24 @@ function ProgramsPage() {
     })
   }
 
-  const toggleDetails = (programId: number) => {
-    setExpandedProgramId(expandedProgramId === programId ? null : programId)
+  const toggleDetails = async (programId: number) => {
+    if (expandedProgramId === programId) {
+      setExpandedProgramId(null)
+      return
+    }
+    setExpandedProgramId(programId)
+    if (programCourses[programId]) {
+      return
+    }
+    setCoursesLoading((prev) => ({ ...prev, [programId]: true }))
+    try {
+      const rows = await getJson<ApiCourse[]>(`/api/programs/${programId}/courses`)
+      setProgramCourses((prev) => ({ ...prev, [programId]: rows ?? [] }))
+    } catch {
+      setProgramCourses((prev) => ({ ...prev, [programId]: [] }))
+    } finally {
+      setCoursesLoading((prev) => ({ ...prev, [programId]: false }))
+    }
   }
 
   return (
@@ -135,13 +176,21 @@ function ProgramsPage() {
             onClick={() => {
               setSearchTerm('')
               setSelectedLocation('All')
+              setSelectedType('All')
             }}
           >
             SHOW ALL PROGRAMS
           </button>
 
-          <button type="button" style={secondaryTopButtonStyle}>
-            PROGRAMS BY TYPE
+          <button
+            type="button"
+            style={secondaryTopButtonStyle}
+            onClick={() => {
+              const firstType = typeOptions.find((t) => t !== 'All') ?? 'All'
+              setSelectedType((prev) => (prev === 'All' ? firstType : 'All'))
+            }}
+          >
+            PROGRAMS BY TYPE: {selectedType.toUpperCase()}
           </button>
         </div>
       </section>
@@ -157,8 +206,17 @@ function ProgramsPage() {
             disabled={loading}
           />
 
-          <select style={selectStyle} defaultValue="">
-            <option value="">Programs by Type</option>
+          <select
+            style={selectStyle}
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+            disabled={loading}
+          >
+            {typeOptions.map((type) => (
+              <option key={type} value={type}>
+                {type === 'All' ? 'Programs by Type (All)' : type}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -206,7 +264,21 @@ function ProgramsPage() {
               {expandedProgramId === program.id && (
                 <div style={detailsBoxStyle}>
                   <h4 style={detailsHeadingStyle}>Program details</h4>
-                  <p style={detailsTextStyle}>{program.programDetails}</p>
+                  <p style={detailsTextStyle}>Institution: {program.institutionName}</p>
+                  {coursesLoading[program.id] && <p style={detailsTextStyle}>Loading courses...</p>}
+                  {!coursesLoading[program.id] && (
+                    <div style={{ marginTop: 8 }}>
+                      {(programCourses[program.id] ?? []).length === 0 ? (
+                        <p style={detailsTextStyle}>No courses currently linked to this program.</p>
+                      ) : (
+                        (programCourses[program.id] ?? []).slice(0, 6).map((course) => (
+                          <p key={course.courseId} style={detailsTextStyle}>
+                            {course.courseCode} - {course.courseName} ({course.credits} cr)
+                          </p>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

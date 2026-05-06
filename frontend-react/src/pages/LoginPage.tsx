@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRoleView } from '../context/RoleViewContext';
-import { ApiError, parseRoleFromLoginMessage, postJsonText } from '../lib/api';
+import { ApiError, postJsonData } from '../lib/api';
 import type { Role } from '../context/RoleViewContext';
 
 type LoginFormData = {
@@ -14,9 +14,17 @@ type LoginFormErrors = {
   password?: string;
 };
 
+type LoginResponse = {
+  userId?: number;
+  name?: string;
+  email?: string;
+  role?: Role;
+  message?: string;
+};
+
 function LoginPage() {
   const navigate = useNavigate();
-  const { setIsLoggedIn, setRole, setAuthSession } = useRoleView();
+  const { setIsLoggedIn, setRole, setAuthSession, setUserIdentity } = useRoleView();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
@@ -63,14 +71,17 @@ function LoginPage() {
     setLoginError('');
     setIsSubmitting(true);
     try {
-      const message = await postJsonText('/api/auth/login', {
+      const response = await postJsonData<LoginResponse>('/api/auth/login', {
         email: formData.email.trim(),
         password: formData.password,
       });
-      const parsed = parseRoleFromLoginMessage(message);
-      const role: Role = parsed ?? 'student';
+      const role: Role =
+        response?.role === 'admin' || response?.role === 'director' || response?.role === 'student'
+          ? response.role
+          : 'student';
       setRole(role);
       setAuthSession(formData.email.trim(), formData.password);
+      setUserIdentity(response?.userId ?? null, response?.name?.trim() ?? '');
       setIsLoggedIn(true);
       if (role === 'admin' || role === 'director') navigate('/dashboard');
       else navigate('/');
@@ -78,7 +89,7 @@ function LoginPage() {
       if (e instanceof ApiError) {
         setLoginError(e.body || 'Login failed.');
       } else {
-        setLoginError('Network error. Is the backend running on port 8080?');
+        setLoginError('Network error. Is the backend running?');
       }
     } finally {
       setIsSubmitting(false);

@@ -7,7 +7,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 function AppLayout() {
  const navigate = useNavigate();
- const { role, isLoggedIn, authEmail, setRole } = useRoleView();
+ const { role, isLoggedIn, authEmail, displayName, setRole, setIsLoggedIn, clearAuthSession } = useRoleView();
  const { theme, toggleTheme } = useTheme();
 
 
@@ -15,6 +15,7 @@ function AppLayout() {
 
 
  const loginIdentity =
+   displayName?.trim() ||
    authEmail?.trim() ||
    `${role.charAt(0).toUpperCase()}${role.slice(1)} user`;
 
@@ -109,48 +110,34 @@ function AppLayout() {
          </button>
 
 
-         <Link to="/login" style={linkStyle}>Login</Link>
-         <Link to="/register" style={linkStyle}>Register</Link>
+         {!isLoggedIn ? (
+           <>
+             <Link to="/login" style={linkStyle}>Login</Link>
+             <Link to="/register" style={linkStyle}>Register</Link>
+           </>
+         ) : (
+           <button
+             type="button"
+             onClick={() => {
+               clearAuthSession();
+               setIsLoggedIn(false);
+               setRole('student');
+               navigate('/login');
+             }}
+             style={{
+               color: '#fff',
+               background: 'transparent',
+               border: '1px solid rgba(255,255,255,0.65)',
+               borderRadius: 6,
+               padding: '0.25rem 0.5rem',
+               cursor: 'pointer',
+             }}
+           >
+             Logout
+           </button>
+         )}
        </div>
      </nav>
-
-
-     {isLoggedIn && role === 'student' && (
-       <div
-         style={{
-           backgroundColor: '#2f7e41',
-           color: '#fff',
-           padding: '0.55rem 1.5rem',
-           fontWeight: 700,
-           display: 'flex',
-           alignItems: 'center',
-           justifyContent: 'space-between',
-           gap: '12px',
-           flexWrap: 'wrap',
-         }}
-       >
-         <span>Viewing as Student</span>
-         <button
-           type="button"
-           onClick={() => {
-             setRole('admin');
-             navigate('/dashboard');
-           }}
-           style={{
-             border: '1px solid rgba(255, 255, 255, 0.8)',
-             borderRadius: '8px',
-             backgroundColor: 'transparent',
-             color: '#fff',
-             padding: '0.3rem 0.7rem',
-             fontWeight: 700,
-             cursor: 'pointer',
-           }}
-         >
-           Switch to Admin
-         </button>
-       </div>
-     )}
-
 
      {/* Main Content Area */}
      <main style={{ flex: 1 }}>

@@ -6,7 +6,6 @@ type RegisterFormData = {
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
   password: string;
   confirmPassword: string;
 };
@@ -15,7 +14,6 @@ type RegisterFormErrors = {
   firstName?: string;
   lastName?: string;
   email?: string;
-  role?: string;
   password?: string;
   confirmPassword?: string;
 };
@@ -26,7 +24,6 @@ function RegisterPage() {
     firstName: '',
     lastName: '',
     email: '',
-    role: '',
     password: '',
     confirmPassword: '',
   });
@@ -53,10 +50,6 @@ function RegisterPage() {
       newErrors.email = 'Email is required.';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address.';
-    }
-
-    if (!formData.role) {
-      newErrors.role = 'Please select a role.';
     }
 
     if (!formData.password.trim()) {
@@ -102,7 +95,7 @@ function RegisterPage() {
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         email: formData.email.trim(),
         password: formData.password,
-        role: formData.role,
+        role: 'student',
       });
       setRegisterSuccess(message);
       setTimeout(() => navigate('/login'), 1500);
@@ -274,36 +267,9 @@ function RegisterPage() {
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <label htmlFor="role" style={{ fontWeight: 600, fontSize: '0.95rem' }}>
-            Role
-          </label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={(e) => handleChange('role', e.target.value)}
-            style={{
-              height: 44,
-              padding: '0 0.85rem',
-              borderRadius: '8px',
-              border: errors.role ? '1px solid #d32f2f' : '1px solid #cfcfcf',
-              fontSize: '1rem',
-              outline: 'none',
-              backgroundColor: '#fff',
-            }}
-          >
-            <option value="">Select your role</option>
-            <option value="student">Student</option>
-            <option value="director">Program Director</option>
-            <option value="admin">Administrator</option>
-          </select>
-          {errors.role && (
-            <span style={{ color: '#d32f2f', fontSize: '0.875rem' }}>
-              {errors.role}
-            </span>
-          )}
-        </div>
+        <p style={{ margin: 0, color: '#555', fontSize: '0.9rem' }}>
+          Public registration creates a <strong>student</strong> account.
+        </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <label htmlFor="password" style={{ fontWeight: 600, fontSize: '0.95rem' }}>

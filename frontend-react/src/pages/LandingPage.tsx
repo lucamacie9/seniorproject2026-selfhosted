@@ -1,7 +1,34 @@
 import type { CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'
+import { getJson } from '../lib/api';
 
+type SummaryCounts = {
+  institutions: number;
+  programs: number;
+  courses: number;
+  knowledgeUnits: number;
+};
 
 function LandingPage() {
+ const [summary, setSummary] = useState<SummaryCounts | null>(null);
+
+ useEffect(() => {
+   let cancelled = false;
+   getJson<SummaryCounts>('/api/summary')
+     .then((data) => {
+       if (cancelled) return;
+       setSummary(data);
+     })
+     .catch(() => {
+       if (cancelled) return;
+       setSummary(null);
+     });
+   return () => {
+     cancelled = true;
+   };
+ }, []);
+
  return (
    <div style={pageStyle}>
      {/* HERO SECTION */}
@@ -22,6 +49,11 @@ function LandingPage() {
          <p style={subtitleStyle}>
            Explore how your completed coursework transfers into Roosevelt University programs.
          </p>
+         {summary && (
+           <p style={summaryStyle}>
+             {summary.institutions} institutions | {summary.programs} programs | {summary.courses} courses | {summary.knowledgeUnits} knowledge units
+           </p>
+         )}
        </div>
      </section>
 
@@ -35,7 +67,7 @@ function LandingPage() {
          <p style={cardDescriptionStyle}>
            Discover how transfer credits work and understand how Roosevelt evaluates your completed coursework.
          </p>
-         <a href="/about" style={cardButtonStyle}>Learn More</a>
+        <Link to="/about" style={cardButtonStyle}>Learn More</Link>
        </div>
 
 
@@ -46,7 +78,7 @@ function LandingPage() {
          <p style={cardDescriptionStyle}>
            Enter your courses and see how they match Roosevelt University requirements.
          </p>
-         <a href="/match" style={cardButtonStyle}>Start Matching</a>
+        <Link to="/match" style={cardButtonStyle}>Start Matching</Link>
        </div>
 
 
@@ -57,7 +89,7 @@ function LandingPage() {
          <p style={cardDescriptionStyle}>
            Explore Roosevelt University degree programs and academic pathways.
          </p>
-         <a href="/programs" style={cardButtonStyle}>View Programs</a>
+        <Link to="/programs" style={cardButtonStyle}>View Programs</Link>
        </div>
      </section>
    </div>
@@ -117,6 +149,12 @@ const subtitleStyle: CSSProperties = {
  margin: 0,
  color: '#4a6b55',
  fontSize: '1.05rem',
+};
+
+const summaryStyle: CSSProperties = {
+ marginTop: '0.75rem',
+ color: '#365b45',
+ fontWeight: 600,
 };
 
 

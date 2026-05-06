@@ -49,14 +49,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 // Auth endpoints open
                 .antMatchers("/api/auth/**").permitAll()
-                // Institutions, programs, knowledge_units => open
-                .antMatchers("/api/institutions/**", "/api/programs/**", "/api/knowledge_units/**").permitAll()
-                // Let /api/match be accessible by ADMIN, DIRECTOR, or STUDENT (or restrict as desired)
-                .antMatchers("/api/match").hasAnyRole("ADMIN","DIRECTOR","STUDENT")
-                // Restrict /api/courses/** to ADMIN, DIRECTOR
-                .antMatchers("/api/courses/**").hasAnyRole("ADMIN", "DIRECTOR")
-                // Restrict DELETE /api/users/** to ADMIN, DIRECTOR
-                .antMatchers(HttpMethod.DELETE, "/api/users/**").hasAnyRole("ADMIN", "DIRECTOR")
+                // Public read endpoints
+                .antMatchers(HttpMethod.GET, "/api/institutions/**", "/api/programs/**", "/api/knowledge_units/**", "/api/summary").permitAll()
+                // Write endpoints are admin/director only
+                .antMatchers(HttpMethod.POST, "/api/institutions/**", "/api/programs/**", "/api/knowledge_units/**").hasAnyRole("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.PUT, "/api/institutions/**", "/api/programs/**", "/api/knowledge_units/**").hasAnyRole("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.DELETE, "/api/institutions/**", "/api/programs/**", "/api/knowledge_units/**").hasAnyRole("ADMIN", "DIRECTOR")
+                // Match read endpoints are accessible by ADMIN, DIRECTOR, or STUDENT.
+                .antMatchers(HttpMethod.GET, "/api/match/**").hasAnyRole("ADMIN","DIRECTOR","STUDENT")
+                .antMatchers(HttpMethod.POST, "/api/match/course-ku").hasAnyRole("ADMIN","DIRECTOR")
+                .antMatchers(HttpMethod.DELETE, "/api/match/course-ku").hasAnyRole("ADMIN","DIRECTOR")
+                .antMatchers(HttpMethod.POST, "/api/match").hasAnyRole("ADMIN","DIRECTOR","STUDENT")
+                // Allow course reads for authenticated users, writes for admin/director.
+                .antMatchers(HttpMethod.GET, "/api/courses/**").hasAnyRole("ADMIN", "DIRECTOR", "STUDENT")
+                .antMatchers(HttpMethod.POST, "/api/courses/**").hasAnyRole("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("ADMIN", "DIRECTOR")
+                .antMatchers(HttpMethod.DELETE, "/api/courses/**").hasAnyRole("ADMIN", "DIRECTOR")
+                // Current user profile endpoint for any authenticated user.
+                .antMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                // User management endpoints are admin/director only.
+                .antMatchers("/api/users/**").hasAnyRole("ADMIN", "DIRECTOR")
                 // Everything else => authenticated
                 .anyRequest().authenticated()
             .and()
