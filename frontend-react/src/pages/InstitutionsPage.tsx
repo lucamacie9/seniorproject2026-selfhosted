@@ -1,19 +1,37 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getJson } from '../lib/api'
 
-type Institution = {
-  institutionId: number | string
-  name: string
-  location?: string | null
+declare global {
+  interface Window {
+    ROOSEVELT_PROGRAMS?: string[]
+  }
 }
 
-type Program = {
-  institutionId: number | string
-  programId?: number | string
-  id?: number | string
-  programName: string
+type CurrentInstitutionGroup = {
+  optgroup: string
+  options: Array<{ value: string; label: string }>
 }
+
+type CurrentInstitutionSingle = {
+  value: string
+  label: string
+}
+
+type CurrentInstitutionEntry = CurrentInstitutionGroup | CurrentInstitutionSingle
+
+const CURRENT_INSTITUTION_STRUCTURE: CurrentInstitutionEntry[] = [
+  {
+    optgroup: 'City Colleges of Chicago',
+    options: [
+      { value: 'ccc-truman', label: 'Truman College' },
+      { value: 'ccc-harold-washington', label: 'Harold Washington College' },
+      { value: 'ccc-wilbur-wright', label: 'Wilbur Wright College' },
+      { value: 'ccc-olive-harvey', label: 'Olive-Harvey College' },
+      { value: 'ccc-kennedy-king', label: 'Kennedy-King College' },
+    ],
+  },
+  { value: 'other-community-college', label: 'Other Community College' },
+  { value: 'other-university', label: 'Other University' },
+]
 
 function normalizeForSearch(value: string): string {
   return value
@@ -24,156 +42,126 @@ function normalizeForSearch(value: string): string {
 }
 
 function InstitutionsPage() {
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
-  const [institutions, setInstitutions] = useState<Institution[]>([])
-  const [programs, setPrograms] = useState<Program[]>([])
+  const [programs, setPrograms] = useState<string[]>([])
+  const [loadingPrograms, setLoadingPrograms] = useState(true)
   const [currentInstitutionId, setCurrentInstitutionId] = useState('')
   const [currentInstitutionQuery, setCurrentInstitutionQuery] = useState('')
-  const [currentProgramValue, setCurrentProgramValue] = useState('')
-  const [targetInstitutionId, setTargetInstitutionId] = useState('')
-  const [targetInstitutionQuery, setTargetInstitutionQuery] = useState('')
+  const [targetInstitutionId] = useState('__roosevelt__')
   const [targetProgramValue, setTargetProgramValue] = useState('')
+  const [targetProgramQuery, setTargetProgramQuery] = useState('')
   const [selectionSummary, setSelectionSummary] = useState(
-    'Select your current institution/program and target institution/program, then confirm.',
+    'Select your current institution and your target program at Roosevelt University.',
   )
 
   const currentInstitutionItems = useMemo(() => {
-    const backendItems = institutions.map((institution) => ({
-      value: String(institution.institutionId),
-      display: institution.location
-        ? `${institution.name} (${institution.location})`
-        : institution.name,
-    }))
-    const seen = new Set<string>()
-    const merged = backendItems.filter((item) => {
-      const key = normalizeForSearch(item.display)
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
+    const items: Array<{ value: string; display: string }> = []
+    CURRENT_INSTITUTION_STRUCTURE.forEach((entry) => {
+      if ('optgroup' in entry) {
+        entry.options.forEach((opt) => {
+          items.push({
+            value: opt.value,
+            display: `${entry.optgroup} — ${opt.label}`,
+          })
+        })
+      } else {
+        items.push({
+          value: entry.value,
+          display: entry.label,
+        })
+      }
     })
-    return merged
-  }, [institutions])
+    return items
+  }, [])
 
-  const suggestedCurrentInstitutionItems = useMemo(() => {
-    const query = normalizeForSearch(currentInstitutionQuery)
-    if (!query) return currentInstitutionItems
-    return currentInstitutionItems.filter((item) =>
-      normalizeForSearch(item.display).includes(query),
-    )
-  }, [currentInstitutionItems, currentInstitutionQuery])
-
-  const suggestedTargetInstitutionItems = useMemo(() => {
-    const query = normalizeForSearch(targetInstitutionQuery)
-    if (!query) return currentInstitutionItems
-    return currentInstitutionItems.filter((item) =>
-      normalizeForSearch(item.display).includes(query),
-    )
-  }, [currentInstitutionItems, targetInstitutionQuery])
-
-  const currentProgramItems = useMemo(() => {
-    if (!currentInstitutionId) return []
-    return programs
-      .filter((program) => String(program.institutionId) === String(currentInstitutionId))
-      .map((program, index) => ({
-        value: String(program.programId ?? program.id ?? `cp-${index}`),
-        display: program.programName,
-      }))
-  }, [programs, currentInstitutionId])
-
-  const targetProgramItems = useMemo(() => {
-    if (!targetInstitutionId) return []
-    return programs
-      .filter((program) => String(program.institutionId) === String(targetInstitutionId))
-      .map((program, index) => ({
-        value: String(program.programId ?? program.id ?? `tp-${index}`),
-        display: program.programName,
-      }))
-  }, [programs, targetInstitutionId])
+  const targetProgramItems = useMemo(
+    () => programs.map((name, index) => ({ value: `p-${index}`, display: name })),
+    [programs],
+  )
 
   useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setLoadError('')
-    Promise.all([getJson<Institution[]>('/api/institutions'), getJson<Program[]>('/api/programs')])
-      .then(([loadedInstitutions, loadedPrograms]) => {
-        if (cancelled) return
-        setInstitutions(loadedInstitutions ?? [])
-        setPrograms(loadedPrograms ?? [])
-        const roosevelt = (loadedInstitutions ?? []).find((institution) =>
-          normalizeForSearch(institution.name).includes('roosevelt'),
-        )
-        if (roosevelt) {
-          setTargetInstitutionId(String(roosevelt.institutionId))
-          setTargetInstitutionQuery(
-            roosevelt.location ? `${roosevelt.name} (${roosevelt.location})` : roosevelt.name,
-          )
-        }
-        const defaultCurrentInstitution = (loadedInstitutions ?? []).find(
-          (institution) => !normalizeForSearch(institution.name).includes('roosevelt'),
-        ) ?? (loadedInstitutions ?? [])[0]
-        if (defaultCurrentInstitution) {
-          setCurrentInstitutionId(String(defaultCurrentInstitution.institutionId))
-          setCurrentInstitutionQuery(
-            defaultCurrentInstitution.location
-              ? `${defaultCurrentInstitution.name} (${defaultCurrentInstitution.location})`
-              : defaultCurrentInstitution.name,
-          )
-        }
-      })
-      .catch((error) => {
-        if (cancelled) return
-        const message =
-          error instanceof Error
-            ? `Could not load institutions/programs: ${error.message}`
-            : `Could not load institutions/programs: ${String(error)}`
-        setLoadError(message)
-        setSelectionSummary(message)
-      })
-      .finally(() => {
-        if (cancelled) return
-        setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
+    if (Array.isArray(window.ROOSEVELT_PROGRAMS)) {
+      setPrograms(window.ROOSEVELT_PROGRAMS)
+      setLoadingPrograms(false)
+      return
     }
+
+    const script = document.createElement('script')
+    script.src = '/roosevelt_programs.js'
+    script.async = true
+    script.onload = () => {
+      setPrograms(Array.isArray(window.ROOSEVELT_PROGRAMS) ? window.ROOSEVELT_PROGRAMS : [])
+      setLoadingPrograms(false)
+    }
+    script.onerror = () => {
+      setPrograms([])
+      setLoadingPrograms(false)
+    }
+    document.body.appendChild(script)
   }, [])
 
   useEffect(() => {
-    setCurrentProgramValue('')
-  }, [currentInstitutionId])
-
-  useEffect(() => {
-    setTargetProgramValue('')
-  }, [targetInstitutionId])
-
-  useEffect(() => {
-    if (!currentProgramValue && currentProgramItems.length > 0) {
-      setCurrentProgramValue(currentProgramItems[0].value)
-    }
-  }, [currentProgramItems, currentProgramValue])
-
-  useEffect(() => {
-    if (!targetProgramValue && targetProgramItems.length > 0) {
-      setTargetProgramValue(targetProgramItems[0].value)
-    }
-  }, [targetProgramItems, targetProgramValue])
-
-  useEffect(() => {
-    if (!loading && institutions.length === 0) {
-      setSelectionSummary('No institutions are available in the backend yet.')
+    if (!loadingPrograms && programs.length === 0) {
+      setSelectionSummary('No programs are available for Roosevelt University.')
       return
     }
-    if (!loading && targetInstitutionId && targetProgramItems.length === 0) {
-      setSelectionSummary('No programs are available for the selected target institution.')
+    setSelectionSummary('Select your current institution and target program, then confirm.')
+  }, [loadingPrograms, programs.length])
+
+  const canConfirm = Boolean(currentInstitutionId && targetInstitutionId === '__roosevelt__' && targetProgramValue)
+
+  function resolveCurrentInstitution(rawValue: string) {
+    const query = normalizeForSearch(rawValue)
+    if (!query) {
+      setCurrentInstitutionId('')
       return
     }
-    setSelectionSummary('Select your current institution/program and target institution/program, then confirm.')
-  }, [loading, institutions.length, targetInstitutionId, targetProgramItems.length])
 
-  const canConfirm = Boolean(currentInstitutionId && currentProgramValue && targetInstitutionId && targetProgramValue)
+    const match =
+      currentInstitutionItems.find(
+        (item) => normalizeForSearch(item.display) === query,
+      ) ??
+      currentInstitutionItems.find((item) =>
+        normalizeForSearch(item.display).startsWith(query),
+      ) ??
+      currentInstitutionItems.find((item) =>
+        normalizeForSearch(item.display).includes(query),
+      )
+
+    if (!match) {
+      setCurrentInstitutionId('')
+      return
+    }
+
+    setCurrentInstitutionId(match.value)
+    setCurrentInstitutionQuery(match.display)
+  }
+
+  function resolveTargetProgram(rawValue: string) {
+    const query = normalizeForSearch(rawValue)
+    if (!query) {
+      setTargetProgramValue('')
+      return
+    }
+
+    const match =
+      targetProgramItems.find(
+        (item) => normalizeForSearch(item.display) === query,
+      ) ??
+      targetProgramItems.find((item) =>
+        normalizeForSearch(item.display).startsWith(query),
+      ) ??
+      targetProgramItems.find((item) =>
+        normalizeForSearch(item.display).includes(query),
+      )
+
+    if (!match) {
+      setTargetProgramValue('')
+      return
+    }
+
+    setTargetProgramValue(match.value)
+    setTargetProgramQuery(match.display)
+  }
 
   function handleConfirmSelection() {
     if (!canConfirm) {
@@ -185,37 +173,13 @@ function InstitutionsPage() {
       (item) => item.value === currentInstitutionId,
     )
     const currentLabel = currentItem ? currentItem.display : currentInstitutionId
-    const currentProgramMatch = currentProgramItems.find((item) => item.value === currentProgramValue)
-    const currentProgramLabel = currentProgramMatch ? currentProgramMatch.display : currentProgramValue
-    const targetItem = currentInstitutionItems.find((item) => item.value === targetInstitutionId)
-    const targetLabel = targetItem ? targetItem.display : targetInstitutionId
+    const targetLabel = 'Roosevelt University'
     const targetProgramMatch = targetProgramItems.find((item) => item.value === targetProgramValue)
     const targetProgramLabel = targetProgramMatch ? targetProgramMatch.display : targetProgramValue
 
     setSelectionSummary(
       `Current: ${currentLabel} (${currentProgramLabel}) → Target: ${targetLabel} | Target Program: ${targetProgramLabel}`,
     )
-
-    const programId = Number(targetProgramValue)
-    const currentInstitutionNumericId = Number(currentInstitutionId)
-    const targetInstitutionNumericId = Number(targetInstitutionId)
-    if (
-      !Number.isFinite(programId) ||
-      !Number.isFinite(currentInstitutionNumericId) ||
-      !Number.isFinite(targetInstitutionNumericId)
-    ) {
-      setSelectionSummary('Selections must map to backend institutions and programs.')
-      return
-    }
-    navigate('/match', {
-      state: {
-        programId,
-        programName: targetProgramLabel,
-        currentInstitutionId: currentInstitutionNumericId,
-        targetInstitutionId: targetInstitutionNumericId,
-        currentInstitutionLabel: currentLabel,
-      },
-    })
   }
 
   return (
@@ -377,93 +341,67 @@ function InstitutionsPage() {
             <div className="mm-grid">
               <div className="mm-card">
                 <h5>Current Institution</h5>
-                <select
-                  id="currentInstitutionSelect"
+                <input
+                  id="currentInstitutionAutocomplete"
                   className="mm-input"
-                  value={currentInstitutionId}
-                  onChange={(e) => {
-                    const selectedId = e.target.value
-                    setCurrentInstitutionId(selectedId)
-                    const selected = currentInstitutionItems.find((item) => item.value === selectedId)
-                    setCurrentInstitutionQuery(selected?.display ?? '')
+                  list="currentInstitutionDatalist"
+                  value={currentInstitutionQuery}
+                  onChange={(e) => setCurrentInstitutionQuery(e.target.value)}
+                  onBlur={(e) => resolveCurrentInstitution(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      resolveCurrentInstitution((e.target as HTMLInputElement).value)
+                    }
                   }}
-                >
-                  <option value="">Select current institution</option>
-                  {suggestedCurrentInstitutionItems.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.display}
-                    </option>
+                  placeholder=" "
+                  autoComplete="off"
+                />
+                <datalist id="currentInstitutionDatalist">
+                  {currentInstitutionItems.map((item) => (
+                    <option key={item.value} value={item.display} />
                   ))}
-                </select>
+                </datalist>
 
                 <h5 style={{ marginTop: 12 }}>Current Program</h5>
-                <select
-                  id="currentProgramSelect"
-                  className="mm-input"
-                  value={currentProgramValue}
-                  onChange={(e) => {
-                    const selectedValue = e.target.value
-                    setCurrentProgramValue(selectedValue)
-                  }}
-                  disabled={loading}
-                >
-                  <option value="">Select current program</option>
-                  {currentProgramItems.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.display}
-                    </option>
-                  ))}
-                </select>
+                <input className="mm-input" type="text" placeholder=" " disabled />
               </div>
 
               <div className="mm-arrow">→</div>
 
               <div className="mm-card">
                 <h5>Target Institution</h5>
-                <select
-                  id="targetInstitutionSelect"
-                  className="mm-input"
-                  value={targetInstitutionId}
-                  onChange={(e) => {
-                    const selectedId = e.target.value
-                    setTargetInstitutionId(selectedId)
-                    const selected = currentInstitutionItems.find((item) => item.value === selectedId)
-                    setTargetInstitutionQuery(selected?.display ?? '')
-                  }}
-                  disabled={loading}
-                >
-                  <option value="">Select target institution</option>
-                  {suggestedTargetInstitutionItems.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.display}
-                    </option>
-                  ))}
+                <select id="targetInstitutionSelect" className="mm-input" value={targetInstitutionId} disabled>
+                  <option value="__roosevelt__">Roosevelt University</option>
                 </select>
 
                 <h5 style={{ marginTop: 12 }}>Target Program</h5>
-                <select
-                  id="targetProgramSelect"
+                <input
+                  id="targetProgramAutocomplete"
                   className="mm-input"
-                  value={targetProgramValue}
-                  onChange={(e) => {
-                    const selectedValue = e.target.value
-                    setTargetProgramValue(selectedValue)
+                  list="targetProgramDatalist"
+                  value={targetProgramQuery}
+                  onChange={(e) => setTargetProgramQuery(e.target.value)}
+                  onBlur={(e) => resolveTargetProgram(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      resolveTargetProgram((e.target as HTMLInputElement).value)
+                    }
                   }}
-                  disabled={loading || !targetInstitutionId || targetProgramItems.length === 0}
-                >
-                  <option value="">Select target program</option>
+                  placeholder=" "
+                  autoComplete="off"
+                  disabled={loadingPrograms || programs.length === 0}
+                />
+                <datalist id="targetProgramDatalist">
                   {targetProgramItems.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.display}
-                    </option>
+                    <option key={item.value} value={item.display} />
                   ))}
-                </select>
+                </datalist>
 
                 <div className="mm-bottom">
                   <button id="confirmSelectionBtn" className="mm-cta" onClick={handleConfirmSelection} disabled={!canConfirm}>
                     Confirm Transfer Goal
                   </button>
-                  <div id="selectionSummary" className="mm-summary">{loadError || selectionSummary}</div>
+                  <div id="selectionSummary" className="mm-summary">{selectionSummary}</div>
                 </div>
               </div>
             </div>
