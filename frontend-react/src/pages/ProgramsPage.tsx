@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getJson } from '../lib/api'
+import { useViewport } from '../context/ViewportContext'
 
 type ApiInstitution = {
   institutionId: number
@@ -32,6 +33,7 @@ type ApiCourse = {
 
 function ProgramsPage() {
   const navigate = useNavigate()
+  const { isMobile } = useViewport()
   const [programs, setPrograms] = useState<ProgramRow[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -147,7 +149,7 @@ function ProgramsPage() {
 
   return (
     <div style={pageStyle}>
-      <section style={heroStyle}>
+      <section style={isMobile ? { ...heroStyle, padding: '32px 16px 24px' } : heroStyle}>
         <h1 style={heroTitleStyle}>TRANSFER PROGRAMS</h1>
         <p style={heroSubtitleStyle}>
           Browse programs from participating institutions and start the transfer matching process.
@@ -202,12 +204,12 @@ function ProgramsPage() {
             placeholder="Search programs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={searchInputStyle}
+            style={isMobile ? { ...searchInputStyle, minWidth: 0 } : searchInputStyle}
             disabled={loading}
           />
 
           <select
-            style={selectStyle}
+            style={isMobile ? { ...selectStyle, minWidth: 0, width: '100%' } : selectStyle}
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
             disabled={loading}

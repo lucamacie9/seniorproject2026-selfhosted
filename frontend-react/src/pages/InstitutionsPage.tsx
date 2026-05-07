@@ -358,6 +358,42 @@ function InstitutionsPage() {
             height:210px;
           }
         }
+        @media (max-width: 600px){
+          .mm-title{
+            font-size: 36px;
+            margin: 18px 0 10px 0;
+          }
+          .mm-hero{
+            height: 160px;
+          }
+          .mm-hero-content{
+            padding: 14px 16px;
+            justify-content: center;
+            text-align: center;
+          }
+          .mm-hero h2{
+            font-size: 28px;
+          }
+          .mm-hero p{
+            display: none;
+          }
+          .mm-card{
+            padding: 16px 16px 14px 16px;
+            border-radius: 14px;
+          }
+          .mm-input{
+            min-height: 44px;
+            font-size: 16px;
+          }
+          .mm-cta{
+            width: 100%;
+            padding: 12px 16px;
+          }
+          .mm-bottom{
+            flex-direction: column;
+            align-items: stretch;
+          }
+        }
       `}</style>
       <div className="mm-page">
         <main className="mm-container">

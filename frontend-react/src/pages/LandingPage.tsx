@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import { getJson } from '../lib/api';
+import { useViewport } from '../context/ViewportContext';
 
 type SummaryCounts = {
   institutions: number;
@@ -12,6 +13,7 @@ type SummaryCounts = {
 
 function LandingPage() {
  const [summary, setSummary] = useState<SummaryCounts | null>(null);
+ const { isMobile } = useViewport();
 
  useEffect(() => {
    let cancelled = false;
@@ -32,16 +34,16 @@ function LandingPage() {
  return (
    <div style={pageStyle}>
      {/* HERO SECTION */}
-     <section style={heroStyle}>
+     <section style={isMobile ? heroStyleMobile : heroStyle}>
        <div style={heroContainer}>
          <img
            src="/ru-banner.jpg"
            alt="Roosevelt University Banner"
-           style={bannerStyle}
+           style={isMobile ? bannerStyleMobile : bannerStyle}
          />
 
 
-         <h1 style={titleStyle}>
+         <h1 style={isMobile ? titleStyleMobile : titleStyle}>
            Transfer to Roosevelt University
          </h1>
 
@@ -120,6 +122,10 @@ const heroStyle: CSSProperties = {
  padding: '3rem 2rem',
 };
 
+const heroStyleMobile: CSSProperties = {
+ padding: '1.5rem 1rem',
+};
+
 
 const heroContainer: CSSProperties = {
  maxWidth: 900,
@@ -136,12 +142,28 @@ const bannerStyle: CSSProperties = {
  marginBottom: '1.5rem',
 };
 
+const bannerStyleMobile: CSSProperties = {
+ width: '100%',
+ height: 120,
+ objectFit: 'contain',
+ borderRadius: '10px',
+ marginBottom: '1rem',
+};
+
 
 const titleStyle: CSSProperties = {
  marginBottom: '0.5rem',
  color: '#1f4d2e',
  fontSize: '2rem',
  fontWeight: 700,
+};
+
+const titleStyleMobile: CSSProperties = {
+ marginBottom: '0.5rem',
+ color: '#1f4d2e',
+ fontSize: '1.5rem',
+ fontWeight: 700,
+ lineHeight: 1.2,
 };
 
 

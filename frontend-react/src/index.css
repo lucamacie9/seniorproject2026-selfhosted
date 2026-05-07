@@ -27,6 +27,26 @@ body {
   min-height: 100vh;
   color: #1b3a22;
   transition: all 0.3s ease;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Mobile-friendly defaults: prevent horizontal overflow from oversized media or long words */
+html, body {
+  overflow-x: hidden;
+}
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+@media (max-width: 767px) {
+  body {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  /* Prevent iOS Safari from auto-zooming when focusing inputs (<16px font triggers zoom) */
+  input, select, textarea {
+    font-size: 16px;
+  }
 }
 
 /* LIGHT MODE BACKGROUND */
