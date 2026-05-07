@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { basicAuthHeader, deleteRequest, getJson, postJsonData, putJsonData, readErrorBody } from '../lib/api'
 import { useRoleView } from '../context/RoleViewContext'
 
@@ -9,11 +10,14 @@ type KnowledgeUnit = { kuId: number; kuName: string; kuDescription?: string | nu
 type CourseKu = { courseId: number; kuId: number; kuName?: string; kuDescription?: string | null }
 
 function DashboardPage() {
-  const { authEmail, authPassword } = useRoleView()
+  const navigate = useNavigate()
+  const { role, setRole, authEmail, authPassword } = useRoleView()
   const authHeaders = useMemo(
     () => (authEmail && authPassword ? basicAuthHeader(authEmail, authPassword) : undefined),
     [authEmail, authPassword],
   )
+
+  const roleLabel = role === 'admin' ? 'Admin' : role === 'director' ? 'Director' : 'Student'
 
   const [institutions, setInstitutions] = useState<Institution[]>([])
   const [programs, setPrograms] = useState<Program[]>([])
@@ -244,10 +248,168 @@ function DashboardPage() {
     return programs.filter((p) => String(p.institutionId) === String(editingCourse.institutionId))
   }, [programs, editingCourse.institutionId])
 
+  const coursesStatValue = authHeaders ? String(courses.length) : '0'
+  const statCards: Array<{ label: string; value: string }> = [
+    { label: 'Institutions', value: String(institutions.length) },
+    { label: 'Programs', value: String(programs.length) },
+    { label: 'Courses', value: coursesStatValue },
+    { label: 'Knowledge Units', value: String(knowledgeUnits.length) },
+  ]
+
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1rem 3rem' }}>
-      <h1 style={{ marginTop: 0 }}>Program Director Dashboard</h1>
-      <p>Manage institutions, programs, courses, and knowledge units using live backend endpoints.</p>
+    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1rem 3rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(420px, 1.3fr) minmax(280px, 1fr)',
+          gap: '1rem',
+          alignItems: 'stretch',
+        }}
+      >
+        <section
+          style={{
+            border: '1px solid #b8dcc4',
+            borderRadius: 20,
+            background: 'linear-gradient(145deg, #f9fffb 0%, #e5f8eb 62%, #d8f0df 100%)',
+            padding: '1.2rem 1.15rem',
+            boxShadow: '0 12px 28px rgba(33, 104, 61, 0.1)',
+            minHeight: 220,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              fontWeight: 800,
+              color: '#2f7e41',
+              fontSize: '0.78rem',
+            }}
+          >
+            {roleLabel}
+          </p>
+          <h1 style={{ margin: '0.35rem 0 0 0', fontSize: '2.5rem', lineHeight: 1, color: '#0f172a' }}>
+            Dashboard
+          </h1>
+          <p style={{ margin: '0.75rem 0 0 0', color: '#385b43', fontSize: '0.95rem' }}>
+            Manage institutions, programs, courses, and knowledge units using live backend endpoints.
+          </p>
+
+          <div
+            style={{
+              marginTop: '1.1rem',
+              display: 'flex',
+              gap: '0.45rem',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
+            <span
+              style={{
+                border: '1px solid #9ec7ab',
+                borderRadius: 999,
+                padding: '0.35rem 0.7rem',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                color: '#1b4f2c',
+                background: '#ecfaf0',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Current role: {roleLabel}
+            </span>
+            <button
+              type="button"
+              onClick={() => setRole('admin')}
+              style={{
+                borderRadius: 999,
+                border: role === 'admin' ? '1px solid #2f7e41' : '1px solid #bbd8c3',
+                background: role === 'admin' ? '#2f7e41' : '#ffffff',
+                color: role === 'admin' ? '#fff' : '#174125',
+                padding: '0.3rem 0.65rem',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              View as Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('director')}
+              style={{
+                borderRadius: 999,
+                border: role === 'director' ? '1px solid #2f7e41' : '1px solid #bbd8c3',
+                background: role === 'director' ? '#2f7e41' : '#ffffff',
+                color: role === 'director' ? '#fff' : '#174125',
+                padding: '0.3rem 0.65rem',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              View as Director
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setRole('student')
+                navigate('/')
+              }}
+              style={{
+                borderRadius: 999,
+                border: '1px solid #bbd8c3',
+                background: '#fff',
+                color: '#174125',
+                padding: '0.3rem 0.65rem',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              View as Student
+            </button>
+          </div>
+        </section>
+
+        <section
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(130px, 1fr))',
+            gap: '0.7rem',
+            alignContent: 'start',
+          }}
+        >
+          {statCards.map((card) => (
+            <div
+              key={card.label}
+              style={{
+                border: '1.5px solid #7faf92',
+                borderRadius: 16,
+                background: 'rgba(255, 255, 255, 0.8)',
+                padding: '0.8rem 0.7rem',
+                minHeight: 90,
+                boxShadow: '0 8px 18px rgba(33, 104, 61, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <p style={{ margin: 0, fontSize: '2rem', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>
+                {card.value}
+              </p>
+              <p style={{ margin: '0.35rem 0 0 0', color: '#334155', fontSize: '0.88rem' }}>{card.label}</p>
+            </div>
+          ))}
+        </section>
+      </div>
+
       {error && <p style={{ color: '#b42318' }}>{error}</p>}
 
       <section style={card}>
